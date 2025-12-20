@@ -14,15 +14,15 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = async (email: string) => {
+  const handleLogin = async (email: string, password?: string) => {
     setLoading(true);
     setError('');
-    const success = await login(email);
+    const result = await login(email, password);
     setLoading(false);
-    if (success) {
+    if (result.success) {
       navigate('/');
     } else {
-      setError('Login failed. User not found.');
+      setError(result.error || 'Login failed.');
     }
   };
 
@@ -62,7 +62,10 @@ const Login = () => {
             onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
-              handleLogin(formData.get('email') as string);
+              const email = formData.get('email') as string;
+              const password = formData.get('password') as string;
+              // Convert empty password to undefined for admin first-time login
+              handleLogin(email, password || undefined);
             }}
             className="space-y-4"
           >
@@ -77,6 +80,22 @@ const Login = () => {
                 placeholder="enter@company.com"
                 className="input-field"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Password
+              </label>
+              <input
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                className="input-field"
+              />
+              <p className="mt-1 text-[10px] text-gray-400">
+                Admin (admin@gmail.com) doesn't need password on first login.
+                Set password in Settings after login.
+              </p>
             </div>
 
             <button

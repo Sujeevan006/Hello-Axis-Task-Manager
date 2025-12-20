@@ -6,11 +6,16 @@ import {
   ReactNode,
 } from 'react';
 import { User } from '../types';
-import { mockUsers } from '../utils/mockData';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string) => Promise<boolean>;
+  login: (
+    email: string,
+    password?: string
+  ) => Promise<{
+    success: boolean;
+    error?: string;
+  }>;
   logout: () => void;
   updateUserProfile: (data: Partial<User>) => void;
   isAuthenticated: boolean;
@@ -27,19 +32,79 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (user) {
       localStorage.setItem('tm_user', JSON.stringify(user));
+      // Sync with tm_users list
+      const savedUsers = localStorage.getItem('tm_users');
+      if (savedUsers) {
+        const users: User[] = JSON.parse(savedUsers);
+        const index = users.findIndex((u) => u.id === user.id);
+        if (index !== -1) {
+          users[index] = user;
+          localStorage.setItem('tm_users', JSON.stringify(users));
+        }
+      }
     } else {
       localStorage.removeItem('tm_user');
     }
   }, [user]);
 
-  const login = async (email: string) => {
-    // Simulate API call
-    const foundUser = mockUsers.find((u) => u.email === email);
-    if (foundUser) {
-      setUser(foundUser);
-      return true;
+  const login = async (email: string, password?: string) => {
+    const savedUsers = localStorage.getItem('tm_users');
+    let allUsers: User[] = savedUsers ? JSON.parse(savedUsers) : [];
+
+    // Special case for Mail Admin
+    if (email === 'admin@gmail.com') {
+      let admin = allUsers.find((u) => u.email === email);
+
+      if (!admin) {
+        // First ever login for the super admin - no password needed
+        admin = {
+          id: 'admin-001',
+          name: 'Admin',
+          email: 'admin@gmail.com',
+          role: 'admin',
+          needsPasswordChange: true,
+        };
+        allUsers.push(admin);
+        localStorage.setItem('tm_users', JSON.stringify(allUsers));
+        setUser(admin);
+        return { success: true };
+      }
+
+      // If admin hasn't set a password yet, allow login without password
+      if (!admin.password) {
+        setUser(admin);
+        return { success: true };
+      }
+
+      // If admin has set a password, require it
+      if (!password) {
+        return { success: false, error: 'Password is required' };
+      }
+
+      if (admin.password === password) {
+        setUser(admin);
+        return { success: true };
+      }
+
+      return { success: false, error: 'Incorrect password' };
     }
-    return false;
+
+    const foundUser = allUsers.find((u) => u.email === email);
+    if (foundUser) {
+      if (!foundUser.password) {
+        return {
+          success: false,
+          error: 'Account not fully set up. Please contact admin.',
+        };
+      }
+      if (foundUser.password === password) {
+        setUser(foundUser);
+        return { success: true };
+      }
+      return { success: false, error: 'Incorrect password' };
+    }
+
+    return { success: false, error: 'User not found' };
   };
 
   const logout = () => {
@@ -48,7 +113,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateUserProfile = (data: Partial<User>) => {
     if (user) {
-      setUser({ ...user, ...data });
+      const updatedUser = { ...user, ...data };
+      setUser(updatedUser);
     }
   };
 

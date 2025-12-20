@@ -6,6 +6,8 @@ export type User = {
   email: string;
   avatar?: string;
   role: Role;
+  password?: string;
+  needsPasswordChange?: boolean;
 };
 
 export type Priority = 'low' | 'medium' | 'high';
@@ -34,7 +36,7 @@ export type Task = {
   createdAt: string;
   history: ActivityLog[];
 };
-    
+
 export type Organization = {
   name: string;
   description: string;

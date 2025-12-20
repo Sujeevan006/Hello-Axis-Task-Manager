@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTaskContext } from '../context/TaskContext';
 import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
@@ -6,7 +7,7 @@ import { Organization } from '../types';
 
 const Settings = () => {
   const { organization, updateOrganization } = useTaskContext();
-  const { user } = useAuth();
+  const { user, updateUserProfile } = useAuth();
   const {
     register,
     handleSubmit,
@@ -15,9 +16,32 @@ const Settings = () => {
     defaultValues: organization,
   });
 
+  const [passwordData, setPasswordData] = useState({
+    newPassword: '',
+    confirmPassword: '',
+  });
+
   const onSubmit = (data: Organization) => {
     updateOrganization(data);
     toast.success('Organization settings updated');
+  };
+
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordData.newPassword) {
+      toast.error('Please enter a new password');
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    updateUserProfile({
+      password: passwordData.newPassword,
+      needsPasswordChange: false,
+    });
+    setPasswordData({ newPassword: '', confirmPassword: '' });
+    toast.success('Admin password updated successfully');
   };
 
   if (user?.role !== 'admin') {
@@ -25,12 +49,15 @@ const Settings = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-navy-900 dark:text-slate-100 mb-6">
-        Organization Settings
+    <div className="max-w-2xl mx-auto space-y-6">
+      <h1 className="text-2xl font-bold text-navy-900 dark:text-slate-100">
+        Settings
       </h1>
 
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-8">
+        <h2 className="text-lg font-bold text-navy-900 dark:text-slate-100 mb-6">
+          Organization Details
+        </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
@@ -64,24 +91,58 @@ const Settings = () => {
             <input {...register('logo')} className="input-field" />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-              Primary Color
-            </label>
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-lg bg-navy-900 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 shadow-sm"
-                title="Navy Blue (Default, Locked)"
+          <div className="flex justify-end pt-4 border-t dark:border-slate-800">
+            <button type="submit" className="btn btn-primary px-8">
+              Update Organization
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-8">
+        <h2 className="text-lg font-bold text-navy-900 dark:text-slate-100 mb-6">
+          Admin Security
+        </h2>
+        <form onSubmit={handlePasswordChange} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                New Admin Password
+              </label>
+              <input
+                type="password"
+                value={passwordData.newPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    newPassword: e.target.value,
+                  })
+                }
+                className="input-field"
+                placeholder="••••••••"
               />
-              <p className="text-sm text-gray-500 dark:text-slate-400">
-                Locked to Navy Blue theme
-              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Confirm New Password
+              </label>
+              <input
+                type="password"
+                value={passwordData.confirmPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    confirmPassword: e.target.value,
+                  })
+                }
+                className="input-field"
+                placeholder="••••••••"
+              />
             </div>
           </div>
-
-          <div className="flex justify-end pt-4">
-            <button type="submit" className="btn btn-primary px-8">
-              Save Settings
+          <div className="flex justify-end pt-2">
+            <button type="submit" className="btn btn-secondary px-8">
+              Save New Password
             </button>
           </div>
         </form>

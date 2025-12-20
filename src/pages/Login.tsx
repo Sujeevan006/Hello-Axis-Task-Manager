@@ -20,7 +20,7 @@ const Login = () => {
     const success = await login(email);
     setLoading(false);
     if (success) {
-      navigate('/dashboard');
+      navigate('/');
     } else {
       setError('Login failed. User not found.');
     }

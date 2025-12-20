@@ -25,7 +25,7 @@ const ProtectedRoute = ({
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
@@ -36,11 +36,9 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
 
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
       <Route element={<Layout />}>
         <Route
-          path="/dashboard"
+          path="/"
           element={
             <ProtectedRoute>
               <Dashboard />
@@ -85,7 +83,7 @@ function App() {
         />
       </Route>
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

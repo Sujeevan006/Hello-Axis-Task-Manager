@@ -34,7 +34,7 @@ const Layout = () => {
   const navItems = [
     {
       name: 'Dashboard',
-      path: '/dashboard',
+      path: '/',
       icon: MdDashboard,
       roles: ['admin', 'staff'],
     },

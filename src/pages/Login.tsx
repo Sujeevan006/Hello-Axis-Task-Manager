@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { MdWork, MdPerson, MdSunny, MdNightlight } from 'react-icons/md';
+import { MdSunny, MdNightlight } from 'react-icons/md';
 import { useTheme } from '../context/ThemeContext';
 import logoLight from '../assets/logoLight.png';
 import logoDark from '../assets/logoDark.png';
@@ -58,46 +58,38 @@ const Login = () => {
             </div>
           )}
 
-          <div className="space-y-4">
-            <button
-              onClick={() => handleLogin('admin@company.com')}
-              disabled={loading}
-              className="w-full group relative p-4 border-2 border-transparent bg-navy-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-500 rounded-xl transition-all duration-200 flex items-center gap-4 text-left"
-            >
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <MdWork size={24} />
-              </div>
-              <div>
-                <h3 className="font-semibold text-navy-900 dark:text-slate-100">
-                  Admin Access
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-slate-400">
-                  Full control over tasks & team
-                </p>
-              </div>
-            </button>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              handleLogin(formData.get('email') as string);
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Email Address
+              </label>
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="enter@company.com"
+                className="input-field"
+              />
+            </div>
 
             <button
-              onClick={() => handleLogin('sarah@company.com')}
+              type="submit"
               disabled={loading}
-              className="w-full group relative p-4 border-2 border-transparent bg-navy-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-green-500 rounded-xl transition-all duration-200 flex items-center gap-4 text-left"
+              className="w-full btn btn-primary py-3"
             >
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <MdPerson size={24} />
-              </div>
-              <div>
-                <h3 className="font-semibold text-navy-900 dark:text-slate-100">
-                  Staff Access
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-slate-400">
-                  View and manage your tasks
-                </p>
-              </div>
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
-          </div>
+          </form>
 
           <div className="mt-8 text-center text-xs text-gray-400">
-            <p>Demo Mode: Click any option to login instantly</p>
+            <p>Login with your registered email</p>
           </div>
         </div>
       </motion.div>

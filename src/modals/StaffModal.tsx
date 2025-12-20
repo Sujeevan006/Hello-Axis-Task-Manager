@@ -65,23 +65,26 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="relative bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden"
+            className="relative bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden border dark:border-slate-800"
           >
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-navy-900">
+            <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-navy-900 dark:text-slate-100">
                 {editStaff ? 'Edit Staff' : 'Add New Staff'}
               </h2>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
               >
-                <MdClose size={24} />
+                <MdClose
+                  size={24}
+                  className="text-gray-500 dark:text-slate-400"
+                />
               </button>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Full Name
                 </label>
                 <input
@@ -97,7 +100,7 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Email Address
                 </label>
                 <input
@@ -117,7 +120,7 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Role
                 </label>
                 <select {...register('role')} className="input-field">

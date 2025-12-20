@@ -37,20 +37,22 @@ const KanbanColumn = ({
     <div className="flex flex-col h-full min-w-[280px] w-80 shrink-0">
       <div
         className={clsx(
-          'flex items-center justify-between p-3 rounded-t-xl border-t-4 bg-white shadow-sm mb-3',
+          'flex items-center justify-between p-3 rounded-t-xl border-t-4 bg-white dark:bg-slate-900 shadow-sm mb-3 dark:border-opacity-60',
           color
         )}
       >
         <div className="flex items-center gap-2">
-          <h3 className="font-bold text-gray-700">{title}</h3>
-          <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs font-bold">
+          <h3 className="font-bold text-gray-700 dark:text-slate-100">
+            {title}
+          </h3>
+          <span className="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 px-2 py-0.5 rounded-full text-xs font-bold">
             {tasks.length}
           </span>
         </div>
         {id === 'todo' && (
           <button
             onClick={onAdd}
-            className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-navy-900 transition-colors"
+            className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded text-gray-500 dark:text-slate-400 hover:text-navy-900 dark:hover:text-slate-100 transition-colors"
           >
             <MdAdd size={20} />
           </button>
@@ -83,7 +85,7 @@ const KanbanColumn = ({
           ))}
         </SortableContext>
         {tasks.length === 0 && (
-          <div className="h-24 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-sm">
+          <div className="h-24 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">
             Drop here
           </div>
         )}

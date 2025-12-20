@@ -26,17 +26,19 @@ const Profile = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-navy-900 mb-6">My Profile</h1>
+      <h1 className="text-2xl font-bold text-navy-900 dark:text-slate-100 mb-6">
+        My Profile
+      </h1>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="h-32 bg-navy-900 w-full relative">
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+        <div className="h-32 bg-navy-900 dark:bg-slate-800 w-full relative">
           <div className="absolute -bottom-12 left-8">
             <img
               src={
                 user.avatar || `https://ui-avatars.com/api/?name=${user.name}`
               }
               alt={user.name}
-              className="w-24 h-24 rounded-full border-4 border-white shadow-md bg-white"
+              className="w-24 h-24 rounded-full border-4 border-white dark:border-slate-900 shadow-md bg-white dark:bg-slate-900"
             />
           </div>
         </div>
@@ -45,7 +47,7 @@ const Profile = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Full Name
                 </label>
                 <input
@@ -60,7 +62,7 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Email Address
                 </label>
                 <input
@@ -77,7 +79,7 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Avatar URL
               </label>
               <input
@@ -91,13 +93,13 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Role (Read Only)
               </label>
               <input
                 value={user.role.toUpperCase()}
                 readOnly
-                className="input-field bg-gray-50 text-gray-500 border-gray-200 cursor-not-allowed"
+                className="input-field bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-700 cursor-not-allowed"
               />
             </div>
 

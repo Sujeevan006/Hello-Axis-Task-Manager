@@ -79,17 +79,20 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
+            className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] border dark:border-slate-800"
           >
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h2 className="text-xl font-bold text-navy-900">
+            <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50/50 dark:bg-slate-800/50">
+              <h2 className="text-xl font-bold text-navy-900 dark:text-slate-100">
                 {editTask ? 'Edit Task' : 'Create New Task'}
               </h2>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors"
               >
-                <MdClose size={24} className="text-gray-500" />
+                <MdClose
+                  size={24}
+                  className="text-gray-500 dark:text-slate-400"
+                />
               </button>
             </div>
 
@@ -98,7 +101,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
               className="p-6 overflow-y-auto space-y-4"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Task Name
                 </label>
                 <input
@@ -114,7 +117,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Description
                 </label>
                 <textarea
@@ -133,7 +136,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                     Assign To
                   </label>
                   <select
@@ -157,7 +160,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                     Priority
                   </label>
                   <select {...register('priority')} className="input-field">
@@ -170,7 +173,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                     Due Date
                   </label>
                   <input
@@ -188,7 +191,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                     Time (Hours)
                   </label>
                   <input

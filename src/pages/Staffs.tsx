@@ -41,8 +41,12 @@ const Staffs = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-navy-900">Team Members</h1>
-          <p className="text-gray-500">Manage your organization's staff</p>
+          <h1 className="text-2xl font-bold text-navy-900 dark:text-slate-100">
+            Team Members
+          </h1>
+          <p className="text-gray-500 dark:text-slate-400">
+            Manage your organization's staff
+          </p>
         </div>
         <button onClick={handleAdd} className="btn btn-primary">
           <MdAdd size={20} />
@@ -54,18 +58,20 @@ const Staffs = () => {
         {users.map((user) => (
           <div
             key={user.id}
-            className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 flex items-center gap-4 hover:shadow-md transition-all"
           >
             <img
               src={
                 user.avatar || `https://ui-avatars.com/api/?name=${user.name}`
               }
               alt={user.name}
-              className="w-16 h-16 rounded-full border-2 border-gray-100 object-cover"
+              className="w-16 h-16 rounded-full border-2 border-gray-100 dark:border-slate-800 object-cover"
             />
             <div className="flex-1 overflow-hidden">
-              <h3 className="font-bold text-navy-900 truncate">{user.name}</h3>
-              <div className="flex items-center gap-1 text-sm text-gray-400 mb-1">
+              <h3 className="font-bold text-navy-900 dark:text-slate-100 truncate">
+                {user.name}
+              </h3>
+              <div className="flex items-center gap-1 text-sm text-gray-400 dark:text-slate-500 mb-1">
                 <MdEmail size={14} />
                 <span className="truncate">{user.email}</span>
               </div>
@@ -73,8 +79,8 @@ const Staffs = () => {
                 className={`px-2 py-0.5 rounded text-xs uppercase font-bold tracking-wide 
                 ${
                   user.role === 'admin'
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'bg-blue-100 text-blue-700'
+                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                    : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                 }`}
               >
                 {user.role}
@@ -84,14 +90,14 @@ const Staffs = () => {
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => handleEdit(user)}
-                className="p-2 hover:bg-gray-100 rounded text-gray-500 hover:text-blue-600 transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 <MdEdit size={18} />
               </button>
               {user.id !== currentUser.id && ( // Prevent self-delete
                 <button
                   onClick={() => handleDelete(user.id)}
-                  className="p-2 hover:bg-gray-100 rounded text-gray-500 hover:text-red-600 transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                 >
                   <MdDelete size={18} />
                 </button>

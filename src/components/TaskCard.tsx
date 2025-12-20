@@ -1,4 +1,3 @@
-import React from 'react';
 import { Task, User } from '../types';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -40,9 +39,10 @@ const TaskCard = ({
   };
 
   const priorityColor = {
-    high: 'text-red-500 bg-red-50',
-    medium: 'text-orange-500 bg-orange-50',
-    low: 'text-green-500 bg-green-50',
+    high: 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 border border-red-100 dark:border-red-900/30',
+    medium:
+      'text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30',
+    low: 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 border border-green-100 dark:border-green-900/30',
   };
 
   const assignee = task.assigneeId ? userMap[task.assigneeId] : null;
@@ -57,7 +57,7 @@ const TaskCard = ({
       {...listeners}
       onClick={onClick}
       className={clsx(
-        'bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-grab active:cursor-grabbing hover:shadow-md transition-all group relative',
+        'bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 cursor-grab active:cursor-grabbing hover:shadow-md transition-all group relative border-b-2',
         isDragging && 'ring-2 ring-blue-500 shadow-xl rotate-2'
       )}
     >
@@ -71,16 +71,16 @@ const TaskCard = ({
           {task.priority}
         </span>
         {canEdit && (
-          <div className="hidden group-hover:flex gap-1 bg-white shadow-sm rounded-lg p-1 absolute top-2 right-2">
+          <div className="hidden group-hover:flex gap-1 bg-white dark:bg-slate-800 shadow-sm rounded-lg p-1 absolute top-2 right-2 border dark:border-slate-700">
             <button
               onClick={onEdit}
-              className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-blue-600"
+              className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
             >
               <MdEdit size={14} />
             </button>
             <button
               onClick={onDelete}
-              className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-red-600"
+              className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"
             >
               <MdDelete size={14} />
             </button>
@@ -88,11 +88,11 @@ const TaskCard = ({
         )}
       </div>
 
-      <h4 className="text-gray-900 font-medium mb-3 line-clamp-2">
+      <h4 className="text-gray-900 dark:text-slate-100 font-medium mb-3 line-clamp-2">
         {task.title}
       </h4>
 
-      <div className="flex items-center justify-between text-xs text-gray-500">
+      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
         <div className="flex items-center gap-1">
           <MdAccessTime size={14} />
           <span>{format(new Date(task.dueDate), 'MMM d')}</span>
@@ -106,7 +106,7 @@ const TaskCard = ({
                 `https://ui-avatars.com/api/?name=${assignee.name}`
               }
               alt={assignee.name}
-              className="w-6 h-6 rounded-full border border-gray-200"
+              className="w-6 h-6 rounded-full border border-gray-200 dark:border-slate-700"
             />
           </div>
         )}

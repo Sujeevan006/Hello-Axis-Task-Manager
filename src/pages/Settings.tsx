@@ -26,14 +26,14 @@ const Settings = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-navy-900 mb-6">
+      <h1 className="text-2xl font-bold text-navy-900 dark:text-slate-100 mb-6">
         Organization Settings
       </h1>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-8">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Organization Name
             </label>
             <input
@@ -48,7 +48,7 @@ const Settings = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Description
             </label>
             <textarea
@@ -58,22 +58,24 @@ const Settings = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Logo URL
             </label>
             <input {...register('logo')} className="input-field" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Primary Color
             </label>
             <div className="flex items-center gap-3">
               <div
-                className="w-10 h-10 rounded-lg bg-navy-900 border-2 border-gray-200 shadow-sm"
+                className="w-10 h-10 rounded-lg bg-navy-900 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 shadow-sm"
                 title="Navy Blue (Default, Locked)"
               />
-              <p className="text-sm text-gray-500">Locked to Navy Blue theme</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">
+                Locked to Navy Blue theme
+              </p>
             </div>
           </div>
 

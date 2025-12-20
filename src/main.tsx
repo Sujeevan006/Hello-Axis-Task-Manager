@@ -6,16 +6,19 @@ import './styles/index.css';
 import App from './App.tsx';
 import { AuthProvider } from './context/AuthContext';
 import { TaskProvider } from './context/TaskContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <TaskProvider>
-          <App />
-          <Toaster position="top-right" />
-        </TaskProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <TaskProvider>
+            <App />
+            <Toaster position="top-right" />
+          </TaskProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </StrictMode>
 );

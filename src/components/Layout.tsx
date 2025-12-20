@@ -10,12 +10,18 @@ import {
   MdLogout,
   MdMenu,
   MdClose,
+  MdSunny,
+  MdNightlight,
 } from 'react-icons/md';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
+import logoLight from '../assets/logoLight.png';
+import logoDark from '../assets/logoDark.png';
 
 const Layout = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -53,7 +59,7 @@ const Layout = () => {
   );
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 dark:bg-slate-950 overflow-hidden transition-colors duration-200">
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
@@ -76,10 +82,14 @@ const Layout = () => {
       >
         <div className="p-6 flex items-center justify-between lg:justify-center border-b border-navy-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-xl">
-              A
-            </div>
-            <h1 className="text-xl font-bold tracking-tight">Axivers</h1>
+            <img
+              src={theme === 'light' ? logoLight : logoDark}
+              alt="Logo"
+              className="h-10 w-auto"
+            />
+            <h1 className="text-xl font-bold tracking-tight text-white">
+              Axivers
+            </h1>
           </div>
           <button
             onClick={() => setIsMobileMenuOpen(false)}
@@ -130,8 +140,20 @@ const Layout = () => {
             </div>
           </div>
           <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 text-gray-300 hover:bg-navy-800 hover:text-white rounded-lg transition-colors border border-navy-800"
+          >
+            {theme === 'light' ? (
+              <MdNightlight size={20} />
+            ) : (
+              <MdSunny size={20} />
+            )}
+            <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+          </button>
+
+          <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-colors"
           >
             <MdLogout size={20} />
             <span>Logout</span>
@@ -142,18 +164,36 @@ const Layout = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile Header */}
-        <header className="lg:hidden p-4 bg-white shadow-sm flex items-center justify-between">
+        <header className="lg:hidden p-4 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 shadow-sm flex items-center justify-between">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="text-navy-900 p-2 hover:bg-gray-100 rounded-lg"
+            className="text-navy-900 dark:text-slate-100 p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
           >
             <MdMenu size={24} />
           </button>
-          <span className="font-bold text-navy-900">
-            {navItems.find((i) => i.path === location.pathname)?.name ||
-              'Task App'}
-          </span>
-          <div className="w-8" /> {/* Spacer */}
+
+          <div className="flex items-center gap-2">
+            <img
+              src={theme === 'light' ? logoLight : logoDark}
+              alt="Logo"
+              className="h-8 w-auto"
+            />
+            <span className="font-bold text-navy-900 dark:text-slate-100">
+              {navItems.find((i) => i.path === location.pathname)?.name ||
+                'Task App'}
+            </span>
+          </div>
+
+          <button
+            onClick={toggleTheme}
+            className="text-navy-900 dark:text-slate-100 p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
+          >
+            {theme === 'light' ? (
+              <MdNightlight size={20} />
+            ) : (
+              <MdSunny size={20} />
+            )}
+          </button>
         </header>
 
         <div className="flex-1 overflow-auto p-4 md:p-8 relative">

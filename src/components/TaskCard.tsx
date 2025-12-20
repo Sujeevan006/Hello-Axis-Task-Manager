@@ -93,10 +93,14 @@ const TaskCard = ({
       </h4>
 
       <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
-        <div className="flex items-center gap-1">
-          <MdAccessTime size={14} />
-          <span>{format(new Date(task.dueDate), 'MMM d')}</span>
-        </div>
+        {task.dueDate ? (
+          <div className="flex items-center gap-1">
+            <MdAccessTime size={14} />
+            <span>{format(new Date(task.dueDate), 'MMM d')}</span>
+          </div>
+        ) : (
+          <div />
+        )}
 
         {assignee && (
           <div className="flex items-center gap-2" title={assignee.name}>

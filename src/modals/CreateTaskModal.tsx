@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MdClose } from 'react-icons/md';
-import { User, Priority, Task } from '../types';
+import { User, Priority, Task, TaskStatus } from '../types';
 import { useTaskContext } from '../context/TaskContext';
 
 interface Props {
@@ -17,8 +17,9 @@ type FormData = {
   description: string;
   assigneeId: string;
   priority: Priority;
-  dueDate: string;
-  timeAllocation: number;
+  status: TaskStatus;
+  dueDate?: string;
+  timeAllocation?: number;
 };
 
 const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
@@ -39,26 +40,33 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
       setValue('description', editTask.description);
       setValue('assigneeId', editTask.assigneeId || '');
       setValue('priority', editTask.priority);
-      setValue('dueDate', editTask.dueDate.split('T')[0]);
-      setValue('timeAllocation', editTask.timeAllocation);
+      setValue('status', editTask.status);
+      setValue(
+        'dueDate',
+        editTask.dueDate ? editTask.dueDate.split('T')[0] : ''
+      );
+      setValue('timeAllocation', editTask.timeAllocation || 0);
     } else {
       reset();
     }
   }, [editTask, isOpen, reset, setValue]);
 
   const onSubmit = (data: FormData) => {
+    const formattedData = {
+      ...data,
+      dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
+      timeAllocation: data.timeAllocation
+        ? Number(data.timeAllocation)
+        : undefined,
+    };
+
     if (editTask) {
-      updateTask(editTask.id, {
-        ...data,
-        dueDate: new Date(data.dueDate).toISOString(),
-      });
+      updateTask(editTask.id, formattedData);
     } else {
       addTask({
-        ...data,
-        status: 'todo',
-        dueDate: new Date(data.dueDate).toISOString(),
-        creatorId: 'current-user-id-handled-in-context', // Context handles real ID
-      });
+        ...formattedData,
+        creatorId: 'current-user-id-handled-in-context',
+      } as any);
     }
     onClose();
     reset();
@@ -171,6 +179,22 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                 </div>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                  Task Status (Process)
+                </label>
+                <select
+                  {...register('status', { required: 'Status is required' })}
+                  className="input-field"
+                  defaultValue="todo"
+                >
+                  <option value="todo">To Do</option>
+                  <option value="in-process">In Process</option>
+                  <option value="review">Review</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
@@ -178,16 +202,9 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                   </label>
                   <input
                     type="date"
-                    {...register('dueDate', {
-                      required: 'Due date is required',
-                    })}
+                    {...register('dueDate')}
                     className="input-field"
                   />
-                  {errors.dueDate && (
-                    <span className="text-red-500 text-xs">
-                      {errors.dueDate.message}
-                    </span>
-                  )}
                 </div>
 
                 <div>
@@ -198,10 +215,10 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                     type="number"
                     step="0.5"
                     {...register('timeAllocation', {
-                      required: true,
-                      min: 0.1,
+                      min: 0,
                     })}
                     className="input-field"
+                    placeholder="Optional"
                   />
                 </div>
               </div>

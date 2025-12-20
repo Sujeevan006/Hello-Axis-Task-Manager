@@ -151,7 +151,9 @@ const Dashboard = () => {
                     </span>
                   </td>
                   <td className="py-3 text-sm text-gray-500 dark:text-slate-400">
-                    {new Date(task.dueDate).toLocaleDateString()}
+                    {task.dueDate
+                      ? new Date(task.dueDate).toLocaleDateString()
+                      : 'No date'}
                   </td>
                 </tr>
               ))}

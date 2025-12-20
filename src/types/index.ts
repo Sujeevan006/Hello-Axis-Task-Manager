@@ -29,12 +29,12 @@ export type Task = {
   creatorId: string;
   status: TaskStatus;
   priority: Priority;
-  dueDate: string;
-  timeAllocation: number;
+  dueDate?: string;
+  timeAllocation?: number;
   createdAt: string;
   history: ActivityLog[];
 };
-
+    
 export type Organization = {
   name: string;
   description: string;

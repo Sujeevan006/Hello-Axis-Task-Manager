@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { MdSunny, MdNightlight } from 'react-icons/md';
+import {
+  MdSunny,
+  MdNightlight,
+  MdVisibility,
+  MdVisibilityOff,
+} from 'react-icons/md';
 import { useTheme } from '../context/ThemeContext';
 import logoLight from '../assets/logoLight.png';
 import logoDark from '../assets/logoDark.png';
@@ -13,6 +18,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (email: string, password?: string) => {
     setLoading(true);
@@ -86,12 +92,26 @@ const Login = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Password
               </label>
-              <input
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                className="input-field"
-              />
+              <div className="relative">
+                <input
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  className="input-field pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <MdVisibilityOff size={20} />
+                  ) : (
+                    <MdVisibility size={20} />
+                  )}
+                </button>
+              </div>
               <p className="mt-1 text-[10px] text-gray-400">
                 Admin (admin@gmail.com) doesn't need password on first login.
                 Set password in Settings after login.

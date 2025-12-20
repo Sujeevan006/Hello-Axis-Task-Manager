@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { Organization } from '../types';
+import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
 const Settings = () => {
   const { organization, updateOrganization } = useTaskContext();
@@ -20,6 +21,9 @@ const Settings = () => {
     newPassword: '',
     confirmPassword: '',
   });
+
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const onSubmit = (data: Organization) => {
     updateOrganization(data);
@@ -42,6 +46,21 @@ const Settings = () => {
     });
     setPasswordData({ newPassword: '', confirmPassword: '' });
     toast.success('Admin password updated successfully');
+  };
+
+  const handleClearPassword = () => {
+    if (
+      window.confirm(
+        'Are you sure you want to clear the admin password? Admin will be able to login without a password.'
+      )
+    ) {
+      updateUserProfile({
+        password: undefined,
+        needsPasswordChange: true,
+      });
+      setPasswordData({ newPassword: '', confirmPassword: '' });
+      toast.success('Admin password cleared successfully');
+    }
   };
 
   if (user?.role !== 'admin') {
@@ -109,38 +128,77 @@ const Settings = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 New Admin Password
               </label>
-              <input
-                type="password"
-                value={passwordData.newPassword}
-                onChange={(e) =>
-                  setPasswordData({
-                    ...passwordData,
-                    newPassword: e.target.value,
-                  })
-                }
-                className="input-field"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={passwordData.newPassword}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      newPassword: e.target.value,
+                    })
+                  }
+                  className="input-field pr-10"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+                  aria-label={
+                    showNewPassword ? 'Hide password' : 'Show password'
+                  }
+                >
+                  {showNewPassword ? (
+                    <MdVisibilityOff size={20} />
+                  ) : (
+                    <MdVisibility size={20} />
+                  )}
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Confirm New Password
               </label>
-              <input
-                type="password"
-                value={passwordData.confirmPassword}
-                onChange={(e) =>
-                  setPasswordData({
-                    ...passwordData,
-                    confirmPassword: e.target.value,
-                  })
-                }
-                className="input-field"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={passwordData.confirmPassword}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  className="input-field pr-10"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+                  aria-label={
+                    showConfirmPassword ? 'Hide password' : 'Show password'
+                  }
+                >
+                  {showConfirmPassword ? (
+                    <MdVisibilityOff size={20} />
+                  ) : (
+                    <MdVisibility size={20} />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-between items-center pt-2">
+            <button
+              type="button"
+              onClick={handleClearPassword}
+              className="btn bg-red-500 hover:bg-red-600 text-white px-6"
+            >
+              Clear Password
+            </button>
             <button type="submit" className="btn btn-secondary px-8">
               Save New Password
             </button>

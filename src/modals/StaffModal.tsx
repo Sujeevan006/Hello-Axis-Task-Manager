@@ -54,23 +54,26 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
     return pass;
   };
 
-  const onSubmit = (data: FormData) => {
-    if (editStaff) {
-      updateStaff(editStaff.id, data);
-      toast.success('Staff updated successfully');
-      onClose();
-    } else {
-      const password = generatePassword();
-      // Auto generate avatar for demo
-      const avatar = `https://ui-avatars.com/api/?name=${data.name}&background=random`;
-      addStaff({
-        ...data,
-        avatar,
-        password,
-        needsPasswordChange: true,
-      });
-      setGeneratedPassword(password);
-      toast.success('Staff created! Please share the password.');
+  const onSubmit = async (data: FormData) => {
+    try {
+      if (editStaff) {
+        await updateStaff(editStaff.id, data);
+        toast.success('Staff updated successfully');
+        onClose();
+      } else {
+        const password = generatePassword();
+        const avatar = `https://ui-avatars.com/api/?name=${data.name}&background=random`;
+        await addStaff({
+          ...data,
+          avatar,
+          password,
+          needsPasswordChange: true,
+        });
+        setGeneratedPassword(password);
+        toast.success('Staff created! Please share the password.');
+      }
+    } catch (error) {
+      toast.error('Operation failed. Please try again.');
     }
   };
 

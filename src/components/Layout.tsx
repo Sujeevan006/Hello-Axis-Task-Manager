@@ -82,11 +82,7 @@ const Layout = () => {
       >
         <div className="p-6 flex items-center justify-between lg:justify-center border-b border-navy-800">
           <div className="flex items-center gap-3">
-            <img
-              src={theme === 'light' ? logoLight : logoDark}
-              alt="Logo"
-              className="h-10 w-auto"
-            />
+            <img src={logoDark} alt="Logo" className="h-10 w-auto" />
             <h1 className="text-xl font-bold tracking-tight text-white">
               Axivers
             </h1>
@@ -153,7 +149,7 @@ const Layout = () => {
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-white bg-red-800 hover:bg-red-500 hover:text-red-300 rounded-lg transition-colors"
           >
             <MdLogout size={20} />
             <span>Logout</span>

@@ -12,10 +12,14 @@ const Staffs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<User | null>(null);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to remove this staff member?')) {
-      deleteStaff(id);
-      toast.success('Staff removed');
+      try {
+        await deleteStaff(id);
+        toast.success('Staff removed');
+      } catch (error) {
+        toast.error('Failed to remove staff');
+      }
     }
   };
 

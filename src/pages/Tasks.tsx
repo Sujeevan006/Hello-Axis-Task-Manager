@@ -206,10 +206,14 @@ const Tasks = () => {
                   setEditingTask(task);
                   setIsModalOpen(true);
                 }}
-                onDelete={(id) => {
+                onDelete={async (id) => {
                   if (confirm('Are you sure you want to delete this task?')) {
-                    deleteTask(id);
-                    toast.success('Task deleted');
+                    try {
+                      await deleteTask(id);
+                      toast.success('Task deleted');
+                    } catch (error) {
+                      toast.error('Failed to delete task');
+                    }
                   }
                 }}
                 onAdd={() => {

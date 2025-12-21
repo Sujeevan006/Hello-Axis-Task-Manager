@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { User } from '../types';
-import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
+import { MdVisibility, MdVisibilityOff, MdCameraAlt } from 'react-icons/md';
 
 const Profile = () => {
   const { user, updateUserProfile } = useAuth();
@@ -26,13 +26,53 @@ const Profile = () => {
 
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const onSubmit = (data: Partial<User>) => {
-    updateUserProfile(data);
-    toast.success('Profile updated successfully');
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+        try {
+          setImagePreview(base64String);
+          await updateUserProfile({ avatar: base64String });
+          toast.success('Profile image updated successfully');
+        } catch (error) {
+          toast.error('Failed to update profile image');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const onSubmit = async (data: Partial<User>) => {
+    try {
+      await updateUserProfile(data);
+      toast.success('Profile updated successfully');
+    } catch (error) {
+      toast.error('Failed to update profile');
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!passwordData.newPassword) {
       toast.error('Please enter a new password');
@@ -42,12 +82,16 @@ const Profile = () => {
       toast.error('Passwords do not match');
       return;
     }
-    updateUserProfile({
-      password: passwordData.newPassword,
-      needsPasswordChange: false,
-    });
-    setPasswordData({ newPassword: '', confirmPassword: '' });
-    toast.success('Password changed successfully');
+    try {
+      await updateUserProfile({
+        password: passwordData.newPassword,
+        needsPasswordChange: false,
+      });
+      setPasswordData({ newPassword: '', confirmPassword: '' });
+      toast.success('Password changed successfully');
+    } catch (error) {
+      toast.error('Failed to update password');
+    }
   };
 
   if (!user) return null;
@@ -73,17 +117,37 @@ const Profile = () => {
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
         <div className="h-32 bg-navy-900 dark:bg-slate-800 w-full relative">
           <div className="absolute -bottom-12 left-8">
-            <img
-              src={
-                user.avatar || `https://ui-avatars.com/api/?name=${user.name}`
-              }
-              alt={user.name}
-              className="w-24 h-24 rounded-full border-4 border-white dark:border-slate-900 shadow-md bg-white dark:bg-slate-900"
-            />
+            <div
+              className="relative group cursor-pointer"
+              onClick={handleImageClick}
+            >
+              <img
+                src={
+                  imagePreview ||
+                  user.avatar ||
+                  `https://ui-avatars.com/api/?name=${user.name}`
+                }
+                alt={user.name}
+                className="w-24 h-24 rounded-full border-4 border-white dark:border-slate-900 shadow-md bg-white dark:bg-slate-900 transition-opacity group-hover:opacity-80"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <MdCameraAlt size={32} className="text-white" />
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </div>
           </div>
         </div>
 
         <div className="pt-16 pb-8 px-8">
+          <p className="text-xs text-gray-500 dark:text-slate-400 mb-6 -mt-2">
+            Click on the profile picture to upload a new photo
+          </p>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

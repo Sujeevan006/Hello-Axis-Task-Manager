@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MdClose } from 'react-icons/md';
 import { User, Priority, Task, TaskStatus } from '../types';
 import { useTaskContext } from '../context/TaskContext';
+import toast from 'react-hot-toast';
 
 interface Props {
   isOpen: boolean;
@@ -51,7 +52,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
     }
   }, [editTask, isOpen, reset, setValue]);
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     const formattedData = {
       ...data,
       dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
@@ -60,16 +61,22 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
         : undefined,
     };
 
-    if (editTask) {
-      updateTask(editTask.id, formattedData);
-    } else {
-      addTask({
-        ...formattedData,
-        creatorId: 'current-user-id-handled-in-context',
-      } as any);
+    try {
+      if (editTask) {
+        await updateTask(editTask.id, formattedData);
+        toast.success('Task updated');
+      } else {
+        await addTask({
+          ...formattedData,
+          creatorId: 'current-user-id-handled-in-context',
+        } as any);
+        toast.success('Task created');
+      }
+      onClose();
+      reset();
+    } catch (error) {
+      toast.error('Failed to save task');
     }
-    onClose();
-    reset();
   };
 
   return (

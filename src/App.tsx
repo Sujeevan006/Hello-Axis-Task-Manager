@@ -7,6 +7,7 @@ import Tasks from './pages/Tasks';
 import Staffs from './pages/Staffs';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import ChangePassword from './pages/ChangePassword';
 import { useAuth } from './context/AuthContext';
 import { Role } from './types';
 
@@ -24,6 +25,16 @@ const ProtectedRoute = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // If user needs password change, force them to change-password page
+  // unless they are already there.
+  if (user?.needsPasswordChange && location.pathname !== '/change-password') {
+    return <Navigate to="/change-password" replace />;
+  }
+
+  // If user does NOT need password change, preventing them from accessing change-password page freely is optional,
+  // but typically they should be allowed or redirected if the page is strictly for forced changes.
+  // For now, let's allow it but the logic above protects other routes.
+
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
@@ -35,6 +46,14 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route
+        path="/change-password"
+        element={
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        }
+      />
 
       <Route element={<Layout />}>
         <Route

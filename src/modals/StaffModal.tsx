@@ -44,15 +44,7 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
     setGeneratedPassword(null);
   }, [editStaff, isOpen, reset, setValue]);
 
-  const generatePassword = () => {
-    const chars =
-      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*';
-    let pass = '';
-    for (let i = 0; i < 10; i++) {
-      pass += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return pass;
-  };
+  // const generatePassword = () => { ... } // Removed
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -61,18 +53,27 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
         toast.success('Staff updated successfully');
         onClose();
       } else {
-        const password = generatePassword();
         const avatar = `https://ui-avatars.com/api/?name=${data.name}&background=random`;
-        await addStaff({
+
+        // Call addStaff, which now returns the generated password from backend
+        // Note: We don't send a password, the backend generates it.
+        const tempPassword = await addStaff({
           ...data,
           avatar,
-          password,
           needsPasswordChange: true,
         });
-        setGeneratedPassword(password);
-        toast.success('Staff created! Please share the password.');
+
+        if (tempPassword) {
+          setGeneratedPassword(tempPassword);
+          toast.success('Staff created! Please share the password.');
+        } else {
+          // Fallback if no password returned (shouldn't happen if backend works)
+          toast.success('Staff created!');
+          onClose();
+        }
       }
     } catch (error) {
+      console.error(error);
       toast.error('Operation failed. Please try again.');
     }
   };

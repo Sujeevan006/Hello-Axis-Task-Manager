@@ -32,8 +32,16 @@ const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
 );
 
 const Dashboard = () => {
-  const { tasks } = useTaskContext();
+  const { tasks, isLoading } = useTaskContext();
   const { user } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy-900 dark:border-slate-100"></div>
+      </div>
+    );
+  }
 
   // Filter for dashboard
   const myTasks =

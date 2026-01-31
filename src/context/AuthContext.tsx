@@ -20,6 +20,10 @@ interface AuthContextType {
   logout: () => void;
   updateUserProfile: (data: Partial<User>) => Promise<void>;
   isAuthenticated: boolean;
+  changePassword: (
+    password: string,
+    newPassword: string
+  ) => Promise<{ success: boolean; message: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -57,7 +61,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('tm_user');
     setUser(null);
+    window.location.href = '/login';
   };
 
   const updateUserProfile = async (data: Partial<User>) => {
@@ -72,6 +79,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const changePassword = async (password: string, newPassword: string) => {
+    try {
+      const response = await authAPI.changePassword(password, newPassword);
+      if (response.success && user) {
+        // Update local user state to reflect password change if needed (e.g., needsPasswordChange = false)
+        setUser({ ...user, needsPasswordChange: false });
+      }
+      return response;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.error || 'Failed to change password'
+      );
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -80,6 +102,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         updateUserProfile,
         isAuthenticated: !!user,
+        changePassword,
       }}
     >
       {children}

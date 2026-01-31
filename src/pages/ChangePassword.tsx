@@ -12,30 +12,41 @@ import { useTheme } from '../context/ThemeContext';
 import logoLight from '../assets/logoLight.png';
 import logoDark from '../assets/logoDark.png';
 
-const Login = () => {
-  const { login } = useAuth();
+const ChangePassword = () => {
+  const { changePassword, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (email: string, password?: string) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
     setError('');
-    const result = await login(email, password);
-    setLoading(false);
-    if (result.success) {
-      // Navigation is handled by ProtectedRoute/AuthContext state updates usually,
-      // but manual navigation is fine.
-      // check if we need to redirect to change-password.
-      // Note: We can't access updated user state immediately here due to closure unless we rely on the result return which we already did by updating AuthContext to return user.
-      // Wait, AuthContext.login returns { success } but sets state.
-      // We can check if result.success is true, and just navigate to '/'.
-      // App.tsx ProtectedRoute will intercept and redirect to /change-password if needed.
-      navigate('/');
-    } else {
-      setError(result.error || 'Login failed.');
+
+    const formData = new FormData(e.currentTarget);
+    const password = formData.get('password') as string;
+    const newPassword = formData.get('newPassword') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    if (newPassword !== confirmPassword) {
+      setError('New passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await changePassword(password, newPassword);
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.message || 'Failed to change password');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to change password');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,9 +69,11 @@ const Login = () => {
             alt="Logo"
             className="h-16 w-auto mx-auto mb-4"
           />
-          <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">
+            Change Password
+          </h1>
           <p className="text-blue-200 dark:text-slate-300">
-            Sign in to manage your tasks
+            You must change your password to continue
           </p>
         </div>
 
@@ -71,46 +84,23 @@ const Login = () => {
             </div>
           )}
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const email = formData.get('email') as string;
-              const password = formData.get('password') as string;
-              // Convert empty password to undefined for admin first-time login
-              handleLogin(email, password || undefined);
-            }}
-            className="space-y-4"
-          >
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                Email Address
-              </label>
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="enter@company.com"
-                className="input-field"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                Password
+                Current Password
               </label>
               <div className="relative">
                 <input
                   name="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
+                  required
                   className="input-field pr-10"
+                  placeholder="Enter current password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
                     <MdVisibilityOff size={20} />
@@ -119,10 +109,32 @@ const Login = () => {
                   )}
                 </button>
               </div>
-              <p className="mt-1 text-[10px] text-gray-400">
-                Admin (admin@gmail.com) doesn't need password on first login.
-                Set password in Settings after login.
-              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                New Password
+              </label>
+              <input
+                name="newPassword"
+                type="password"
+                required
+                className="input-field"
+                placeholder="Enter new password"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Confirm New Password
+              </label>
+              <input
+                name="confirmPassword"
+                type="password"
+                required
+                className="input-field"
+                placeholder="Confirm new password"
+              />
             </div>
 
             <button
@@ -130,17 +142,20 @@ const Login = () => {
               disabled={loading}
               className="w-full btn btn-primary py-3"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Changing...' : 'Change Password'}
+            </button>
+            <button
+              type="button"
+              onClick={logout}
+              className="w-full text-sm text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200"
+            >
+              Cancel & Logout
             </button>
           </form>
-
-          <div className="mt-8 text-center text-xs text-gray-400">
-            <p>Login with your registered email</p>
-          </div>
         </div>
       </motion.div>
     </div>
   );
 };
 
-export default Login;
+export default ChangePassword;

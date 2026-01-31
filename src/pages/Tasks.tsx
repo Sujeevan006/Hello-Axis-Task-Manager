@@ -21,8 +21,16 @@ import { MdSearch, MdAdd } from 'react-icons/md';
 import toast from 'react-hot-toast';
 
 const Tasks = () => {
-  const { tasks, users, moveTask, deleteTask } = useTaskContext();
+  const { tasks, users, moveTask, deleteTask, isLoading } = useTaskContext();
   const { user: currentUser } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy-900 dark:border-slate-100"></div>
+      </div>
+    );
+  }
 
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

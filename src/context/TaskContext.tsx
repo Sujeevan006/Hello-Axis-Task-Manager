@@ -5,9 +5,8 @@ import {
   useEffect,
   ReactNode,
 } from 'react';
-import { Task, User, Organization, ActivityLog, TaskStatus } from '../types';
+import { Task, User, Organization, TaskStatus } from '../types';
 import { mockOrganization } from '../utils/mockData';
-import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from './AuthContext';
 import { taskAPI, userAPI } from '../services/api';
 
@@ -15,16 +14,22 @@ interface TaskContextType {
   tasks: Task[];
   users: User[];
   organization: Organization;
-  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'history'>) => Promise<void>;
+  addTask: (
+    task: Omit<
+      Task,
+      'id' | 'createdAt' | 'activityLogs' | 'creator' | 'assignee'
+    >
+  ) => Promise<void>;
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   moveTask: (taskId: string, newStatus: TaskStatus) => Promise<void>;
-  addStaff: (staff: Omit<User, 'id'>) => Promise<void>;
+  addStaff: (staff: Omit<User, 'id'>) => Promise<string>;
   updateStaff: (id: string, updates: Partial<User>) => Promise<void>;
   deleteStaff: (id: string) => Promise<void>;
   updateOrganization: (updates: Partial<Organization>) => void;
   refreshTasks: () => Promise<void>;
   refreshUsers: () => Promise<void>;
+  isLoading: boolean;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -34,6 +39,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [organization, setOrganization] = useState<Organization>(() => {
     const saved = localStorage.getItem('tm_org');
     return saved ? JSON.parse(saved) : mockOrganization;
@@ -61,59 +67,33 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
 
   // Initial load
   useEffect(() => {
-    refreshTasks();
-    refreshUsers();
+    const init = async () => {
+      setIsLoading(true);
+      await Promise.all([refreshTasks(), refreshUsers()]);
+      setIsLoading(false);
+    };
+    init();
   }, []);
 
   useEffect(() => {
     localStorage.setItem('tm_org', JSON.stringify(organization));
   }, [organization]);
 
-  const addLog = (taskId: string, action: string) => {
-    if (!currentUser) return;
-    const newLog: ActivityLog = {
-      id: uuidv4(),
-      taskId,
-      userId: currentUser.id,
-      userName: currentUser.name,
-      action,
-      timestamp: new Date().toISOString(),
-    };
-
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === taskId) {
-          return { ...t, history: [newLog, ...(t.history || [])] };
-        }
-        return t;
-      })
-    );
-  };
-
   const addTask = async (
-    taskData: Omit<Task, 'id' | 'createdAt' | 'history'>
+    taskData: Omit<
+      Task,
+      'id' | 'createdAt' | 'activityLogs' | 'creator' | 'assignee'
+    >
   ) => {
     try {
-      const newTask: Partial<Task> = {
+      // Backend handles ID, createdAt, Creator, and initial activity log
+      const newTask = {
         ...taskData,
-        id: uuidv4(),
-        createdAt: new Date().toISOString(),
-        createdBy: currentUser?.id || 'system',
+        creatorId: currentUser?.id || '',
       };
 
-      const createdTask = await taskAPI.create(newTask);
-
-      // Add initial log
-      const creationLog: ActivityLog = {
-        id: uuidv4(),
-        taskId: createdTask.id,
-        userId: currentUser?.id || 'system',
-        userName: currentUser?.name || 'System',
-        action: 'created the task',
-        timestamp: new Date().toISOString(),
-      };
-
-      setTasks((prev) => [{ ...createdTask, history: [creationLog] }, ...prev]);
+      const createdTask = await taskAPI.create(newTask as Partial<Task>);
+      setTasks((prev) => [createdTask, ...prev]);
     } catch (error) {
       console.error('Failed to add task:', error);
       throw error;
@@ -123,9 +103,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const updateTask = async (id: string, updates: Partial<Task>) => {
     try {
       const updatedTask = await taskAPI.update(id, updates);
-      setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, ...updatedTask } : t))
-      );
+      setTasks((prev) => prev.map((t) => (t.id === id ? updatedTask : t)));
     } catch (error) {
       console.error('Failed to update task:', error);
       throw error;
@@ -137,8 +115,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     if (!task || task.status === newStatus) return;
 
     try {
-      await updateTask(taskId, { status: newStatus });
-      addLog(taskId, `moved task to ${newStatus.replace('-', ' ')}`);
+      const updatedTask = await taskAPI.updateStatus(taskId, newStatus);
+      setTasks((prev) => prev.map((t) => (t.id === taskId ? updatedTask : t)));
     } catch (error) {
       console.error('Failed to move task:', error);
       throw error;
@@ -157,12 +135,10 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
 
   const addStaff = async (staffData: Omit<User, 'id'>) => {
     try {
-      const newUser: Partial<User> = {
-        ...staffData,
-        id: uuidv4(),
-      };
-      const createdUser = await userAPI.create(newUser);
+      const createdUser = await userAPI.create(staffData);
       setUsers((prev) => [...prev, createdUser]);
+      // Return temporary password if available (backend structure might need to return this)
+      return (createdUser as any).tempPassword || '';
     } catch (error) {
       console.error('Failed to add staff:', error);
       throw error;
@@ -209,6 +185,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
         updateOrganization,
         refreshTasks,
         refreshUsers,
+        isLoading,
       }}
     >
       {children}

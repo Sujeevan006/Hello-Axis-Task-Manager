@@ -68,7 +68,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
       } else {
         await addTask({
           ...formattedData,
-          creatorId: 'current-user-id-handled-in-context',
+          // creatorId is handled by context/backend
         } as any);
         toast.success('Task created');
       }

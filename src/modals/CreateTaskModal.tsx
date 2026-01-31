@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MdClose } from 'react-icons/md';
 import { User, Priority, Task, TaskStatus } from '../types';
 import { useTaskContext } from '../context/TaskContext';
+import { taskAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
 interface Props {
@@ -25,6 +26,8 @@ type FormData = {
 
 const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
   const { addTask, updateTask } = useTaskContext();
+  const [detailedTask, setDetailedTask] = useState<Task | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -36,6 +39,25 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
   });
 
   useEffect(() => {
+    const fetchDetailedTask = async () => {
+      if (editTask?.id) {
+        try {
+          const task = await taskAPI.getById(editTask.id);
+          setDetailedTask(task);
+        } catch (error) {
+          console.error('Failed to fetch detailed task info');
+        }
+      } else {
+        setDetailedTask(null);
+      }
+    };
+
+    if (isOpen) {
+      fetchDetailedTask();
+    }
+  }, [editTask, isOpen]);
+
+  useEffect(() => {
     if (editTask) {
       setValue('title', editTask.title);
       setValue('description', editTask.description);
@@ -44,11 +66,12 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
       setValue('status', editTask.status);
       setValue(
         'dueDate',
-        editTask.dueDate ? editTask.dueDate.split('T')[0] : ''
+        editTask.dueDate ? editTask.dueDate.split('T')[0] : '',
       );
       setValue('timeAllocation', editTask.timeAllocation || 0);
     } else {
       reset();
+      setDetailedTask(null);
     }
   }, [editTask, isOpen, reset, setValue]);
 
@@ -229,6 +252,37 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                   />
                 </div>
               </div>
+
+              {detailedTask &&
+                detailedTask.activityLogs &&
+                detailedTask.activityLogs.length > 0 && (
+                  <div className="mt-6 border-t border-gray-100 dark:border-slate-800 pt-4">
+                    <h3 className="text-sm font-bold text-navy-900 dark:text-slate-100 mb-3">
+                      Activity History
+                    </h3>
+                    <div className="space-y-3 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                      {detailedTask.activityLogs.map((log) => (
+                        <div key={log.id} className="flex gap-3 text-xs">
+                          <div className="min-w-[60px] text-gray-400">
+                            {log.timestamp
+                              ? new Date(log.timestamp).toLocaleDateString()
+                              : ''}
+                          </div>
+                          <div>
+                            <p className="text-gray-700 dark:text-slate-300 font-medium">
+                              {log.action}
+                            </p>
+                            <p className="text-gray-400">
+                              User:{' '}
+                              {users.find((u) => u.id === log.userId)?.name ||
+                                log.userId}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               <div className="pt-4 flex justify-end gap-3">
                 <button

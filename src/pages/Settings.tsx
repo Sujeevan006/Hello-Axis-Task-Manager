@@ -51,7 +51,7 @@ const Settings = () => {
   const handleClearPassword = () => {
     if (
       window.confirm(
-        'Are you sure you want to clear the admin password? Admin will be able to login without a password.'
+        'Are you sure you want to clear the admin password? Admin will be able to login without a password.',
       )
     ) {
       updateUserProfile({

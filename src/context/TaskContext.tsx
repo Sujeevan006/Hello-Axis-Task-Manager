@@ -18,7 +18,7 @@ interface TaskContextType {
     task: Omit<
       Task,
       'id' | 'createdAt' | 'activityLogs' | 'creator' | 'assignee'
-    >
+    >,
   ) => Promise<void>;
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -68,12 +68,20 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   // Initial load
   useEffect(() => {
     const init = async () => {
-      setIsLoading(true);
-      await Promise.all([refreshTasks(), refreshUsers()]);
-      setIsLoading(false);
+      if (currentUser) {
+        setIsLoading(true);
+        // Only fetch if we have a user
+        await Promise.all([refreshTasks(), refreshUsers()]);
+        setIsLoading(false);
+      } else {
+        // If no user, ensure state is clean
+        setTasks([]);
+        setUsers([]);
+        setIsLoading(false);
+      }
     };
     init();
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     localStorage.setItem('tm_org', JSON.stringify(organization));
@@ -83,7 +91,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     taskData: Omit<
       Task,
       'id' | 'createdAt' | 'activityLogs' | 'creator' | 'assignee'
-    >
+    >,
   ) => {
     try {
       // Backend handles ID, createdAt, Creator, and initial activity log

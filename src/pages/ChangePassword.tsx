@@ -18,12 +18,14 @@ const ChangePassword = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     const formData = new FormData(e.currentTarget);
     const password = formData.get('password') as string;
@@ -39,7 +41,10 @@ const ChangePassword = () => {
     try {
       const result = await changePassword(password, newPassword);
       if (result.success) {
-        navigate('/');
+        setSuccess('New password updated successfully');
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
       } else {
         setError(result.message || 'Failed to change password');
       }
@@ -79,8 +84,14 @@ const ChangePassword = () => {
 
         <div className="p-8">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm text-center border dark:border-red-900/30">
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm text-center border border-red-200 dark:border-red-900/30">
               {error}
+            </div>
+          )}
+
+          {success && !error && (
+            <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg text-sm text-center border border-green-200 dark:border-green-900/30">
+              {success}
             </div>
           )}
 

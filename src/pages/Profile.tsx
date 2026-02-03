@@ -85,7 +85,7 @@ const Profile = () => {
     try {
       await updateUserProfile({
         password: passwordData.newPassword,
-        needsPasswordChange: false,
+        needs_password_change: false,
       });
       setPasswordData({ newPassword: '', confirmPassword: '' });
       toast.success('Password changed successfully');
@@ -107,7 +107,7 @@ const Profile = () => {
         </p>
       </div>
 
-      {user.needsPasswordChange && (
+      {user.needs_password_change && (
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 p-4 rounded-xl text-amber-800 dark:text-amber-400 text-sm">
           <strong>Security Notice:</strong> Please update your password to
           secure your account.

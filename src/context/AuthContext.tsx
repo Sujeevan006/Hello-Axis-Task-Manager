@@ -12,7 +12,7 @@ interface AuthContextType {
   user: User | null;
   login: (
     email: string,
-    password?: string
+    password?: string,
   ) => Promise<{
     success: boolean;
     error?: string;
@@ -22,7 +22,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   changePassword: (
     password: string,
-    newPassword: string
+    newPassword: string,
   ) => Promise<{ success: boolean; message: string }>;
 }
 
@@ -83,13 +83,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await authAPI.changePassword(password, newPassword);
       if (response.success && user) {
-        // Update local user state to reflect password change if needed (e.g., needsPasswordChange = false)
-        setUser({ ...user, needsPasswordChange: false });
+        // Update local user state to reflect password change if needed (e.g., needs_password_change = false)
+        setUser({ ...user, needs_password_change: false });
       }
       return response;
     } catch (error: any) {
       throw new Error(
-        error.response?.data?.error || 'Failed to change password'
+        error.response?.data?.error || 'Failed to change password',
       );
     }
   };

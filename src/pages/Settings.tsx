@@ -42,7 +42,7 @@ const Settings = () => {
     }
     updateUserProfile({
       password: passwordData.newPassword,
-      needsPasswordChange: false,
+      needs_password_change: false,
     });
     setPasswordData({ newPassword: '', confirmPassword: '' });
     toast.success('Admin password updated successfully');
@@ -56,7 +56,7 @@ const Settings = () => {
     ) {
       updateUserProfile({
         password: undefined,
-        needsPasswordChange: true,
+        needs_password_change: true,
       });
       setPasswordData({ newPassword: '', confirmPassword: '' });
       toast.success('Admin password cleared successfully');

@@ -1,9 +1,10 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const api = axios.create({
   baseURL:
-    import.meta.env.VITE_API_URL ||
-    'https://hello-axis-task-manager-backend-production.up.railway.app/',
+    import.meta.env.VITE_API_BASE_URL ||
+    'https://hello-axis-task-manager-backend-production.up.railway.app/api',
 });
 
 // Request Interceptor
@@ -33,6 +34,14 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
+
+    if (error.response && error.response.status === 403) {
+      toast.error(
+        error.response.data?.error ||
+          'You do not have permission to perform this action',
+      );
+    }
+
     return Promise.reject(error);
   },
 );

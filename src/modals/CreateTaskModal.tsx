@@ -17,11 +17,11 @@ interface Props {
 type FormData = {
   title: string;
   description: string;
-  assigneeId: string;
+  assignee_id: string;
   priority: Priority;
   status: TaskStatus;
-  dueDate?: string;
-  timeAllocation?: number;
+  due_date?: string;
+  time_allocation?: number;
 };
 
 const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
@@ -61,14 +61,14 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
     if (editTask) {
       setValue('title', editTask.title);
       setValue('description', editTask.description);
-      setValue('assigneeId', editTask.assigneeId || '');
+      setValue('assignee_id', editTask.assignee_id || '');
       setValue('priority', editTask.priority);
       setValue('status', editTask.status);
       setValue(
-        'dueDate',
-        editTask.dueDate ? editTask.dueDate.split('T')[0] : '',
+        'due_date',
+        editTask.due_date ? editTask.due_date.split('T')[0] : '',
       );
-      setValue('timeAllocation', editTask.timeAllocation || 0);
+      setValue('time_allocation', editTask.time_allocation || 0);
     } else {
       reset();
       setDetailedTask(null);
@@ -78,10 +78,10 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
   const onSubmit = async (data: FormData) => {
     const formattedData = {
       ...data,
-      dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
-      timeAllocation: data.timeAllocation
-        ? Number(data.timeAllocation)
-        : undefined,
+      due_date: data.due_date ? new Date(data.due_date).toISOString() : null,
+      time_allocation: data.time_allocation
+        ? Number(data.time_allocation)
+        : null,
     };
 
     try {
@@ -178,7 +178,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                     Assign To
                   </label>
                   <select
-                    {...register('assigneeId', {
+                    {...register('assignee_id', {
                       required: 'Assignee is required',
                     })}
                     className="input-field"
@@ -190,9 +190,9 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                       </option>
                     ))}
                   </select>
-                  {errors.assigneeId && (
+                  {errors.assignee_id && (
                     <span className="text-red-500 text-xs">
-                      {errors.assigneeId.message}
+                      {errors.assignee_id.message}
                     </span>
                   )}
                 </div>
@@ -232,7 +232,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                   </label>
                   <input
                     type="date"
-                    {...register('dueDate')}
+                    {...register('due_date')}
                     className="input-field"
                   />
                 </div>
@@ -244,7 +244,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                   <input
                     type="number"
                     step="0.5"
-                    {...register('timeAllocation', {
+                    {...register('time_allocation', {
                       min: 0,
                     })}
                     className="input-field"
@@ -254,14 +254,14 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
               </div>
 
               {detailedTask &&
-                detailedTask.activityLogs &&
-                detailedTask.activityLogs.length > 0 && (
+                detailedTask.activity_logs &&
+                detailedTask.activity_logs.length > 0 && (
                   <div className="mt-6 border-t border-gray-100 dark:border-slate-800 pt-4">
                     <h3 className="text-sm font-bold text-navy-900 dark:text-slate-100 mb-3">
                       Activity History
                     </h3>
                     <div className="space-y-3 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                      {detailedTask.activityLogs.map((log) => (
+                      {detailedTask.activity_logs.map((log) => (
                         <div key={log.id} className="flex gap-3 text-xs">
                           <div className="min-w-[60px] text-gray-400">
                             {log.timestamp
@@ -274,8 +274,8 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                             </p>
                             <p className="text-gray-400">
                               User:{' '}
-                              {users.find((u) => u.id === log.userId)?.name ||
-                                log.userId}
+                              {users.find((u) => u.id === log.user_id)?.name ||
+                                log.user_id}
                             </p>
                           </div>
                         </div>

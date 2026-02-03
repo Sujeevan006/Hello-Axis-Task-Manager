@@ -27,7 +27,7 @@ const ProtectedRoute = ({
 
   // If user needs password change, force them to change-password page
   // unless they are already there.
-  if (user?.needsPasswordChange && location.pathname !== '/change-password') {
+  if (user?.needs_password_change && location.pathname !== '/change-password') {
     return <Navigate to="/change-password" replace />;
   }
 

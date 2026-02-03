@@ -17,7 +17,7 @@ interface TaskContextType {
   addTask: (
     task: Omit<
       Task,
-      'id' | 'createdAt' | 'activityLogs' | 'creator' | 'assignee'
+      'id' | 'created_at' | 'activity_logs' | 'creator' | 'assignee'
     >,
   ) => Promise<void>;
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
@@ -90,14 +90,14 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const addTask = async (
     taskData: Omit<
       Task,
-      'id' | 'createdAt' | 'activityLogs' | 'creator' | 'assignee'
+      'id' | 'created_at' | 'activity_logs' | 'creator' | 'assignee'
     >,
   ) => {
     try {
       // Backend handles ID, createdAt, Creator, and initial activity log
       const newTask = {
         ...taskData,
-        creatorId: currentUser?.id || '',
+        creator_id: currentUser?.id || '',
       };
 
       const createdTask = await taskAPI.create(newTask as Partial<Task>);
@@ -143,10 +143,10 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
 
   const addStaff = async (staffData: Omit<User, 'id'>) => {
     try {
-      const createdUser = await userAPI.create(staffData);
-      setUsers((prev) => [...prev, createdUser]);
-      // Return temporary password if available (backend structure might need to return this)
-      return (createdUser as any).tempPassword || '';
+      const response = await userAPI.create(staffData);
+      setUsers((prev) => [...prev, response.user]);
+      // Return temporary password
+      return response.tempPassword || '';
     } catch (error) {
       console.error('Failed to add staff:', error);
       throw error;

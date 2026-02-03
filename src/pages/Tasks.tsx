@@ -47,7 +47,9 @@ const Tasks = () => {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -99,14 +101,17 @@ const Tasks = () => {
       // "Staff View only tasks assigned to them or created by them"
       // "Admin sees all tasks"
       if (currentUser?.role !== 'admin') {
-        if (t.assigneeId !== currentUser?.id && t.creatorId !== currentUser?.id)
+        if (
+          t.assignee_id !== currentUser?.id &&
+          t.creator_id !== currentUser?.id
+        )
           return false;
       }
 
       const matchSearch = t.title.toLowerCase().includes(search.toLowerCase());
       const matchPriority =
         filterPriority === 'all' || t.priority === filterPriority;
-      const matchStaff = filterStaff === 'all' || t.assigneeId === filterStaff;
+      const matchStaff = filterStaff === 'all' || t.assignee_id === filterStaff;
 
       return matchSearch && matchPriority && matchStaff;
     });

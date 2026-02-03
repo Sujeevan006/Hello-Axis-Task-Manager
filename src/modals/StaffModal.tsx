@@ -21,7 +21,7 @@ type FormData = {
 const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
   const { addStaff, updateStaff } = useTaskContext();
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(
-    null
+    null,
   );
 
   const {
@@ -60,7 +60,7 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
         const tempPassword = await addStaff({
           ...data,
           avatar,
-          needsPasswordChange: true,
+          needs_password_change: true,
         });
 
         if (tempPassword) {
@@ -105,8 +105,8 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
                 {generatedPassword
                   ? 'Staff Created Successfully'
                   : editStaff
-                  ? 'Edit Staff'
-                  : 'Add New Staff'}
+                    ? 'Edit Staff'
+                    : 'Add New Staff'}
               </h2>
               <button
                 onClick={onClose}

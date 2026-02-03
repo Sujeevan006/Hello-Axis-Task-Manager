@@ -1,44 +1,46 @@
 export type Role = 'admin' | 'staff';
 
-export type User = {
+export interface User {
   id: string;
   name: string;
   email: string;
   role: Role;
   avatar?: string;
   department?: string;
-  password?: string;
-  needsPasswordChange?: boolean;
-};
+  needs_password_change: boolean;
+  password?: string; // For updates/creation
+  created_at?: string;
+  updated_at?: string;
+}
 
 export type Priority = 'low' | 'medium' | 'high';
 
 export type TaskStatus = 'todo' | 'in-process' | 'review' | 'completed';
 
-export type ActivityLog = {
+export interface ActivityLog {
   id: string;
-  taskId?: string; // Made optional or ensure it's always there
-  userId: string;
+  task_id: string;
+  user_id: string;
   action: string;
   timestamp: string;
-};
+  user?: { name: string };
+}
 
-export type Task = {
+export interface Task {
   id: string;
   title: string;
   description: string;
   status: TaskStatus;
   priority: Priority;
-  dueDate?: string;
-  timeAllocation?: number;
-  creatorId: string;
-  assigneeId?: string;
-  createdAt: string;
-  updatedAt?: string;
-  creator?: User;
-  assignee?: User;
-  activityLogs?: ActivityLog[];
-};
+  due_date: string | null;
+  time_allocation: number | null;
+  creator_id: string;
+  assignee_id: string | null;
+  created_at: string;
+  creator?: { id: string; name: string; avatar?: string };
+  assignee?: { id: string; name: string; avatar?: string };
+  activity_logs?: ActivityLog[];
+}
 
 export type Organization = {
   name: string;

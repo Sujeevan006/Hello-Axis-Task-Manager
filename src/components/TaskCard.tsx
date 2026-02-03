@@ -45,9 +45,9 @@ const TaskCard = ({
     low: 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 border border-green-100 dark:border-green-900/30',
   };
 
-  const assignee = task.assigneeId ? userMap[task.assigneeId] : null;
+  const assignee = task.assignee_id ? userMap[task.assignee_id] : null;
 
-  const canEdit = user?.role === 'admin' || user?.id === task.creatorId;
+  const canEdit = user?.role === 'admin' || user?.id === task.creator_id;
 
   return (
     <div
@@ -58,14 +58,14 @@ const TaskCard = ({
       onClick={onClick}
       className={clsx(
         'bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 cursor-grab active:cursor-grabbing hover:shadow-md transition-all group relative border-b-2',
-        isDragging && 'ring-2 ring-blue-500 shadow-xl rotate-2'
+        isDragging && 'ring-2 ring-blue-500 shadow-xl rotate-2',
       )}
     >
       <div className="flex justify-between items-start mb-2">
         <span
           className={clsx(
             'text-xs font-semibold px-2 py-0.5 rounded',
-            priorityColor[task.priority]
+            priorityColor[task.priority],
           )}
         >
           {task.priority}
@@ -93,10 +93,10 @@ const TaskCard = ({
       </h4>
 
       <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
-        {task.dueDate ? (
+        {task.due_date ? (
           <div className="flex items-center gap-1">
             <MdAccessTime size={14} />
-            <span>{format(new Date(task.dueDate), 'MMM d')}</span>
+            <span>{format(new Date(task.due_date), 'MMM d')}</span>
           </div>
         ) : (
           <div />

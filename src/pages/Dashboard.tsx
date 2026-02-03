@@ -48,7 +48,7 @@ const Dashboard = () => {
     user?.role === 'admin'
       ? tasks
       : tasks.filter(
-          (t) => t.assigneeId === user?.id || t.creatorId === user?.id
+          (t) => t.assignee_id === user?.id || t.creator_id === user?.id,
         );
 
   const todo = myTasks.filter((t) => t.status === 'todo').length;
@@ -59,7 +59,7 @@ const Dashboard = () => {
   const recentTasks = [...myTasks]
     .sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     )
     .slice(0, 5);
 
@@ -135,10 +135,10 @@ const Dashboard = () => {
                         task.status === 'completed'
                           ? 'status-completed'
                           : task.status === 'review'
-                          ? 'status-review'
-                          : task.status === 'in-process'
-                          ? 'status-process'
-                          : 'status-todo'
+                            ? 'status-review'
+                            : task.status === 'in-process'
+                              ? 'status-process'
+                              : 'status-todo'
                       }`}
                     >
                       {task.status.replace('-', ' ')}
@@ -151,16 +151,16 @@ const Dashboard = () => {
                         task.priority === 'high'
                           ? 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400'
                           : task.priority === 'medium'
-                          ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400'
-                          : 'bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400'
+                            ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400'
+                            : 'bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400'
                       }`}
                     >
                       {task.priority}
                     </span>
                   </td>
                   <td className="py-3 text-sm text-gray-500 dark:text-slate-400">
-                    {task.dueDate
-                      ? new Date(task.dueDate).toLocaleDateString()
+                    {task.due_date
+                      ? new Date(task.due_date).toLocaleDateString()
                       : 'No date'}
                   </td>
                 </tr>

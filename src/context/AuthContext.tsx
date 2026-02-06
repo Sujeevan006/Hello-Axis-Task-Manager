@@ -68,31 +68,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   const login = async (email: string, password: string) => {
-    // TEMPORARY: Hardcoded superadmin for development testing
-    // TODO: Remove when backend registration is properly set up
-    if (
-      import.meta.env.DEV &&
-      email === 'superadmin@axivers.com' &&
-      password === 'Axis@123'
-    ) {
-      console.log('⚠️ USING HARDCODED SUPERADMIN CREDENTIALS FOR DEVELOPMENT');
-      const mockUser = {
-        id: 'superadmin-dev-id',
-        name: 'Super Admin',
-        email: 'superadmin@axivers.com',
-        role: 'admin' as const,
-        avatar: null,
-        department: 'Management',
-        needs_password_change: false,
-        created_at: new Date().toISOString(),
-      };
-
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('token', 'dev-superadmin-token-12345');
-      return { success: true };
-    }
-
     try {
       const response = await authAPI.login(email, password);
 

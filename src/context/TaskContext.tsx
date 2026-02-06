@@ -99,8 +99,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     > & { assignee_id?: string },
   ) => {
     try {
-      const createdTask = await taskAPI.create(taskData);
-      setTasks((prev) => [createdTask, ...prev]);
+      await taskAPI.create(taskData);
+      await refreshTasks(); // Re-fetch to get real UUIDs and linked objects
     } catch (error) {
       console.error('Failed to add task:', error);
       throw error;
@@ -109,8 +109,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
 
   const updateTask = async (id: string, updates: any) => {
     try {
-      const updatedTask = await taskAPI.update(id, updates);
-      setTasks((prev) => prev.map((t) => (t.id === id ? updatedTask : t)));
+      await taskAPI.update(id, updates);
+      await refreshTasks();
     } catch (error) {
       console.error('Failed to update task:', error);
       throw error;
@@ -122,8 +122,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     if (!task || task.status === newStatus) return;
 
     try {
-      const updatedTask = await taskAPI.updateStatus(taskId, newStatus);
-      setTasks((prev) => prev.map((t) => (t.id === taskId ? updatedTask : t)));
+      await taskAPI.updateStatus(taskId, newStatus);
+      await refreshTasks();
     } catch (error) {
       console.error('Failed to move task:', error);
       throw error;
@@ -133,7 +133,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const deleteTask = async (id: string) => {
     try {
       await taskAPI.delete(id);
-      setTasks((prev) => prev.filter((t) => t.id !== id));
+      await refreshTasks();
     } catch (error) {
       console.error('Failed to delete task:', error);
       throw error;
@@ -147,9 +147,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     > & { password?: string; role?: string },
   ) => {
     try {
-      // Backend returns message, user, tempPassword
       const response = await userAPI.create(staffData);
-      setUsers((prev) => [...prev, response.user]);
+      await refreshUsers();
       return response.tempPassword || '';
     } catch (error) {
       console.error('Failed to add staff:', error);
@@ -159,8 +158,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
 
   const updateStaff = async (id: string, updates: Partial<User>) => {
     try {
-      const updatedUser = await userAPI.update(id, updates);
-      setUsers((prev) => prev.map((u) => (u.id === id ? updatedUser : u)));
+      await userAPI.update(id, updates);
+      await refreshUsers();
     } catch (error) {
       console.error('Failed to update staff:', error);
       throw error;
@@ -170,7 +169,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const deleteStaff = async (id: string) => {
     try {
       await userAPI.delete(id);
-      setUsers((prev) => prev.filter((u) => u.id !== id));
+      await refreshUsers();
     } catch (error) {
       console.error('Failed to delete staff:', error);
       throw error;

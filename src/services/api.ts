@@ -6,6 +6,12 @@ import api from '../api/axios';
 export const userAPI = {
   // Get all users (Admin only)
   getAll: async (): Promise<User[]> => {
+    if (
+      import.meta.env.DEV &&
+      localStorage.getItem('token') === 'dev-superadmin-token-12345'
+    ) {
+      return JSON.parse(localStorage.getItem('mock_users') || '[]');
+    }
     const response = await api.get('/users');
     return response.data;
   },
@@ -14,6 +20,32 @@ export const userAPI = {
   create: async (
     userData: Partial<User> & { password?: string },
   ): Promise<{ user: User; tempPassword?: string }> => {
+    // Mock for development mode
+    if (
+      import.meta.env.DEV &&
+      localStorage.getItem('token') === 'dev-superadmin-token-12345'
+    ) {
+      const newUser: User = {
+        id: 'mock-user-' + Math.random().toString(36).substr(2, 9),
+        name: userData.name || 'Mock User',
+        email: userData.email || 'mock@example.com',
+        role: userData.role || 'user',
+        avatar: null,
+        department: userData.department || null,
+        needs_password_change: true,
+        created_at: new Date().toISOString(),
+      };
+
+      const mockUsers = JSON.parse(localStorage.getItem('mock_users') || '[]');
+      localStorage.setItem(
+        'mock_users',
+        JSON.stringify([...mockUsers, newUser]),
+      );
+
+      console.log('⚠️ MOCK STAFF CREATION SUCCESSFUL');
+      return { user: newUser, tempPassword: 'GeneratedPass123' };
+    }
+
     const response = await api.post('/users', userData);
     return response.data;
   },
@@ -88,9 +120,13 @@ export const authAPI = {
         token,
       };
     } catch (error: any) {
+      console.error('Login failed with error response:', error.response?.data);
       return {
         success: false,
-        error: error.response?.data?.error || 'Login failed',
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Login failed',
       };
     }
   },
@@ -126,6 +162,12 @@ export const taskAPI = {
     priority?: string;
     assignee?: string;
   }): Promise<Task[]> => {
+    if (
+      import.meta.env.DEV &&
+      localStorage.getItem('token') === 'dev-superadmin-token-12345'
+    ) {
+      return JSON.parse(localStorage.getItem('mock_tasks') || '[]');
+    }
     const params = new URLSearchParams();
     if (filters?.status) params.append('status', filters.status);
     if (filters?.priority) params.append('priority', filters.priority);
@@ -143,6 +185,24 @@ export const taskAPI = {
 
   // Create task
   create: async (taskData: any): Promise<Task> => {
+    if (
+      import.meta.env.DEV &&
+      localStorage.getItem('token') === 'dev-superadmin-token-12345'
+    ) {
+      const newTask: Task = {
+        id: 'mock-task-' + Math.random().toString(36).substr(2, 9),
+        ...taskData,
+        created_at: new Date().toISOString(),
+        creator: { id: 'superadmin-dev-id', name: 'Super Admin', avatar: null },
+      };
+      const mockTasks = JSON.parse(localStorage.getItem('mock_tasks') || '[]');
+      localStorage.setItem(
+        'mock_tasks',
+        JSON.stringify([...mockTasks, newTask]),
+      );
+      console.log('⚠️ MOCK TASK CREATION SUCCESSFUL');
+      return newTask;
+    }
     const response = await api.post('/tasks', taskData);
     return response.data;
   },

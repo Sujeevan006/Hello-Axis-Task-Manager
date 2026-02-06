@@ -49,6 +49,10 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
   // const generatePassword = () => { ... } // Removed
 
   const onSubmit = async (data: FormData) => {
+    // Sanitize email
+    if (data.email) {
+      data.email = data.email.trim().toLowerCase();
+    }
     try {
       if (editStaff) {
         await updateStaff(editStaff.id, data);

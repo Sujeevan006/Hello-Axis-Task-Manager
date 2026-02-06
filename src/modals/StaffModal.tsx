@@ -16,6 +16,7 @@ type FormData = {
   name: string;
   email: string;
   role: Role;
+  department?: string;
 };
 
 const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
@@ -37,9 +38,10 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
       setValue('name', editStaff.name);
       setValue('email', editStaff.email);
       setValue('role', editStaff.role);
+      setValue('department', editStaff.department || '');
     } else {
       reset();
-      setValue('role', 'staff');
+      setValue('role', 'user');
     }
     setGeneratedPassword(null);
   }, [editStaff, isOpen, reset, setValue]);
@@ -53,21 +55,15 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
         toast.success('Staff updated successfully');
         onClose();
       } else {
-        const avatar = `https://ui-avatars.com/api/?name=${data.name}&background=random`;
-
         // Call addStaff, which now returns the generated password from backend
-        // Note: We don't send a password, the backend generates it.
-        const tempPassword = await addStaff({
-          ...data,
-          avatar,
-          needs_password_change: true,
-        });
+        // Note: We don't send a password, the backend generates it or uses a default.
+        // We can pass a default password if we want, or let backend handle it.
+        const tempPassword = await addStaff(data);
 
         if (tempPassword) {
           setGeneratedPassword(tempPassword);
           toast.success('Staff created! Please share the password.');
         } else {
-          // Fallback if no password returned (shouldn't happen if backend works)
           toast.success('Staff created!');
           onClose();
         }
@@ -186,10 +182,21 @@ const StaffModal = ({ isOpen, onClose, editStaff }: Props) => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                    Department
+                  </label>
+                  <input
+                    {...register('department')}
+                    className="input-field"
+                    placeholder="e.g. IT, HR, Marketing"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                     Role
                   </label>
                   <select {...register('role')} className="input-field">
-                    <option value="staff">Staff</option>
+                    <option value="user">Staff</option>
                     <option value="admin">Admin</option>
                   </select>
                 </div>

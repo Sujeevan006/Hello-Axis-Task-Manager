@@ -6,7 +6,7 @@ import { User } from '../types';
 import { MdVisibility, MdVisibilityOff, MdCameraAlt } from 'react-icons/md';
 
 const Profile = () => {
-  const { user, updateUserProfile } = useAuth();
+  const { user, updateUserProfile, changePassword } = useAuth();
   const {
     register,
     handleSubmit,
@@ -20,10 +20,12 @@ const Profile = () => {
   });
 
   const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
 
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -74,6 +76,10 @@ const Profile = () => {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!passwordData.currentPassword) {
+      toast.error('Please enter your current password');
+      return;
+    }
     if (!passwordData.newPassword) {
       toast.error('Please enter a new password');
       return;
@@ -83,14 +89,18 @@ const Profile = () => {
       return;
     }
     try {
-      await updateUserProfile({
-        password: passwordData.newPassword,
-        needs_password_change: false,
+      await changePassword(
+        passwordData.currentPassword,
+        passwordData.newPassword,
+      );
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
       });
-      setPasswordData({ newPassword: '', confirmPassword: '' });
       toast.success('Password changed successfully');
-    } catch (error) {
-      toast.error('Failed to update password');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update password');
     }
   };
 
@@ -207,6 +217,36 @@ const Profile = () => {
           Change Password
         </h2>
         <form onSubmit={handlePasswordChange} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Current Password
+            </label>
+            <div className="relative">
+              <input
+                type={showCurrentPassword ? 'text' : 'password'}
+                value={passwordData.currentPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    currentPassword: e.target.value,
+                  })
+                }
+                className="input-field pr-10"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+              >
+                {showCurrentPassword ? (
+                  <MdVisibilityOff size={20} />
+                ) : (
+                  <MdVisibility size={20} />
+                )}
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">

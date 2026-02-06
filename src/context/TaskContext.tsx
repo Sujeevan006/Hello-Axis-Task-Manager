@@ -18,12 +18,17 @@ interface TaskContextType {
     task: Omit<
       Task,
       'id' | 'created_at' | 'activity_logs' | 'creator' | 'assignee'
-    >,
+    > & { assignee_id?: string },
   ) => Promise<void>;
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   moveTask: (taskId: string, newStatus: TaskStatus) => Promise<void>;
-  addStaff: (staff: Omit<User, 'id'>) => Promise<string>;
+  addStaff: (
+    staff: Omit<
+      User,
+      'id' | 'created_at' | 'avatar' | 'department' | 'needs_password_change'
+    > & { password?: string; role?: string },
+  ) => Promise<string>;
   updateStaff: (id: string, updates: Partial<User>) => Promise<void>;
   deleteStaff: (id: string) => Promise<void>;
   updateOrganization: (updates: Partial<Organization>) => void;
@@ -91,16 +96,10 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     taskData: Omit<
       Task,
       'id' | 'created_at' | 'activity_logs' | 'creator' | 'assignee'
-    >,
+    > & { assignee_id?: string },
   ) => {
     try {
-      // Backend handles ID, createdAt, Creator, and initial activity log
-      const newTask = {
-        ...taskData,
-        creator_id: currentUser?.id || '',
-      };
-
-      const createdTask = await taskAPI.create(newTask as Partial<Task>);
+      const createdTask = await taskAPI.create(taskData);
       setTasks((prev) => [createdTask, ...prev]);
     } catch (error) {
       console.error('Failed to add task:', error);
@@ -108,7 +107,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateTask = async (id: string, updates: Partial<Task>) => {
+  const updateTask = async (id: string, updates: any) => {
     try {
       const updatedTask = await taskAPI.update(id, updates);
       setTasks((prev) => prev.map((t) => (t.id === id ? updatedTask : t)));
@@ -141,11 +140,16 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const addStaff = async (staffData: Omit<User, 'id'>) => {
+  const addStaff = async (
+    staffData: Omit<
+      User,
+      'id' | 'created_at' | 'avatar' | 'department' | 'needs_password_change'
+    > & { password?: string; role?: string },
+  ) => {
     try {
+      // Backend returns message, user, tempPassword
       const response = await userAPI.create(staffData);
       setUsers((prev) => [...prev, response.user]);
-      // Return temporary password
       return response.tempPassword || '';
     } catch (error) {
       console.error('Failed to add staff:', error);

@@ -8,7 +8,7 @@ import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
 const Settings = () => {
   const { organization, updateOrganization } = useTaskContext();
-  const { user, updateUserProfile } = useAuth();
+  const { user, changePassword } = useAuth();
   const {
     register,
     handleSubmit,
@@ -18,10 +18,12 @@ const Settings = () => {
   });
 
   const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
 
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -30,8 +32,12 @@ const Settings = () => {
     toast.success('Organization settings updated');
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!passwordData.currentPassword) {
+      toast.error('Please enter your current password');
+      return;
+    }
     if (!passwordData.newPassword) {
       toast.error('Please enter a new password');
       return;
@@ -40,26 +46,19 @@ const Settings = () => {
       toast.error('Passwords do not match');
       return;
     }
-    updateUserProfile({
-      password: passwordData.newPassword,
-      needs_password_change: false,
-    });
-    setPasswordData({ newPassword: '', confirmPassword: '' });
-    toast.success('Admin password updated successfully');
-  };
-
-  const handleClearPassword = () => {
-    if (
-      window.confirm(
-        'Are you sure you want to clear the admin password? Admin will be able to login without a password.',
-      )
-    ) {
-      updateUserProfile({
-        password: undefined,
-        needs_password_change: true,
+    try {
+      await changePassword(
+        passwordData.currentPassword,
+        passwordData.newPassword,
+      );
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
       });
-      setPasswordData({ newPassword: '', confirmPassword: '' });
-      toast.success('Admin password cleared successfully');
+      toast.success('Admin password updated successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update password');
     }
   };
 
@@ -123,6 +122,39 @@ const Settings = () => {
           Admin Security
         </h2>
         <form onSubmit={handlePasswordChange} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Current Admin Password
+            </label>
+            <div className="relative">
+              <input
+                type={showCurrentPassword ? 'text' : 'password'}
+                value={passwordData.currentPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    currentPassword: e.target.value,
+                  })
+                }
+                className="input-field pr-10"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+                aria-label={
+                  showCurrentPassword ? 'Hide password' : 'Show password'
+                }
+              >
+                {showCurrentPassword ? (
+                  <MdVisibilityOff size={20} />
+                ) : (
+                  <MdVisibility size={20} />
+                )}
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
@@ -191,14 +223,7 @@ const Settings = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-between items-center pt-2">
-            <button
-              type="button"
-              onClick={handleClearPassword}
-              className="btn bg-red-500 hover:bg-red-600 text-white px-6"
-            >
-              Clear Password
-            </button>
+          <div className="flex justify-end pt-2">
             <button type="submit" className="btn btn-secondary px-8">
               Save New Password
             </button>

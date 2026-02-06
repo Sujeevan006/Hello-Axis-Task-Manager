@@ -4,7 +4,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import TaskCard from './TaskCard';
-import { Task, User, TaskStatus } from '../types';
+import { Task, TaskStatus } from '../types';
 import clsx from 'clsx';
 import { MdAdd } from 'react-icons/md';
 
@@ -12,7 +12,6 @@ interface Props {
   id: TaskStatus;
   title: string;
   tasks: Task[];
-  userMap: Record<string, User>;
   onTaskClick: (task: Task) => void;
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
@@ -24,7 +23,6 @@ const KanbanColumn = ({
   id,
   title,
   tasks,
-  userMap,
   onTaskClick,
   onEdit,
   onDelete,
@@ -38,7 +36,7 @@ const KanbanColumn = ({
       <div
         className={clsx(
           'flex items-center justify-between p-3 rounded-t-xl border-t-4 bg-white dark:bg-slate-900 shadow-sm mb-3 dark:border-opacity-60',
-          color
+          color,
         )}
       >
         <div className="flex items-center gap-2">
@@ -71,7 +69,6 @@ const KanbanColumn = ({
             <TaskCard
               key={task.id}
               task={task}
-              userMap={userMap}
               onClick={() => onTaskClick(task)}
               onEdit={(e) => {
                 e.stopPropagation();

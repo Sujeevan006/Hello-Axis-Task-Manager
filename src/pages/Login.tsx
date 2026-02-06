@@ -20,19 +20,14 @@ const Login = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (email: string, password?: string) => {
+  const handleLogin = async (email: string, password: string) => {
     setLoading(true);
     setError('');
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
-      // Navigation is handled by ProtectedRoute/AuthContext state updates usually,
-      // but manual navigation is fine.
-      // check if we need to redirect to change-password.
-      // Note: We can't access updated user state immediately here due to closure unless we rely on the result return which we already did by updating AuthContext to return user.
-      // Wait, AuthContext.login returns { success } but sets state.
-      // We can check if result.success is true, and just navigate to '/'.
-      // App.tsx ProtectedRoute will intercept and redirect to /change-password if needed.
+      // If user needs password change, redirection is handled
+      // by ProtectedRoute in App.tsx when navigating to /
       navigate('/');
     } else {
       setError(result.error || 'Login failed.');
@@ -77,8 +72,7 @@ const Login = () => {
               const formData = new FormData(e.currentTarget);
               const email = formData.get('email') as string;
               const password = formData.get('password') as string;
-              // Convert empty password to undefined for admin first-time login
-              handleLogin(email, password || undefined);
+              handleLogin(email, password);
             }}
             className="space-y-4"
           >
@@ -103,6 +97,7 @@ const Login = () => {
                 <input
                   name="password"
                   type={showPassword ? 'text' : 'password'}
+                  required
                   placeholder="••••••••"
                   className="input-field pr-10"
                 />
@@ -119,10 +114,6 @@ const Login = () => {
                   )}
                 </button>
               </div>
-              <p className="mt-1 text-[10px] text-gray-400">
-                Admin (admin@gmail.com) doesn't need password on first login.
-                Set password in Settings after login.
-              </p>
             </div>
 
             <button

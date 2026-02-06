@@ -1,11 +1,6 @@
 import { useTaskContext } from '../context/TaskContext';
 import { useAuth } from '../context/AuthContext';
-import {
-  MdAssignment,
-  MdPendingActions,
-  MdDoneAll,
-  MdTimer,
-} from 'react-icons/md';
+import { MdAssignment, MdPendingActions, MdDoneAll } from 'react-icons/md';
 import { motion } from 'framer-motion';
 
 const StatCard = ({ title, value, icon: Icon, color, delay }: any) => (
@@ -48,12 +43,11 @@ const Dashboard = () => {
     user?.role === 'admin'
       ? tasks
       : tasks.filter(
-          (t) => t.assignee_id === user?.id || t.creator_id === user?.id,
+          (t) => t.assignee?.id === user?.id || t.creator.id === user?.id,
         );
 
   const todo = myTasks.filter((t) => t.status === 'todo').length;
-  const inProcess = myTasks.filter((t) => t.status === 'in-process').length;
-  const review = myTasks.filter((t) => t.status === 'review').length;
+  const inProcess = myTasks.filter((t) => t.status === 'in_process').length;
   const completed = myTasks.filter((t) => t.status === 'completed').length;
 
   const recentTasks = [...myTasks]
@@ -74,7 +68,7 @@ const Dashboard = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
           title="To Do"
           value={todo}
@@ -88,13 +82,6 @@ const Dashboard = () => {
           icon={MdPendingActions}
           color="bg-amber-500"
           delay={0.2}
-        />
-        <StatCard
-          title="Review"
-          value={review}
-          icon={MdTimer}
-          color="bg-purple-500"
-          delay={0.3}
         />
         <StatCard
           title="Completed"
@@ -134,14 +121,12 @@ const Dashboard = () => {
                       ${
                         task.status === 'completed'
                           ? 'status-completed'
-                          : task.status === 'review'
-                            ? 'status-review'
-                            : task.status === 'in-process'
-                              ? 'status-process'
-                              : 'status-todo'
+                          : task.status === 'in_process'
+                            ? 'status-process'
+                            : 'status-todo'
                       }`}
                     >
-                      {task.status.replace('-', ' ')}
+                      {task.status.replace('_', ' ')}
                     </span>
                   </td>
                   <td className="py-3">

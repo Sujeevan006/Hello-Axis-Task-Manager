@@ -21,7 +21,7 @@ type FormData = {
   priority: Priority;
   status: TaskStatus;
   due_date?: string;
-  time_allocation?: number;
+  time_allocation?: string;
 };
 
 const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
@@ -61,14 +61,14 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
     if (editTask) {
       setValue('title', editTask.title);
       setValue('description', editTask.description);
-      setValue('assignee_id', editTask.assignee_id || '');
+      setValue('assignee_id', editTask.assignee?.id || '');
       setValue('priority', editTask.priority);
       setValue('status', editTask.status);
       setValue(
         'due_date',
         editTask.due_date ? editTask.due_date.split('T')[0] : '',
       );
-      setValue('time_allocation', editTask.time_allocation || 0);
+      setValue('time_allocation', editTask.time_allocation || '');
     } else {
       reset();
       setDetailedTask(null);
@@ -79,9 +79,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
     const formattedData = {
       ...data,
       due_date: data.due_date ? new Date(data.due_date).toISOString() : null,
-      time_allocation: data.time_allocation
-        ? Number(data.time_allocation)
-        : null,
+      time_allocation: data.time_allocation || null,
     };
 
     try {
@@ -89,10 +87,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
         await updateTask(editTask.id, formattedData);
         toast.success('Task updated');
       } else {
-        await addTask({
-          ...formattedData,
-          // creatorId is handled by context/backend
-        } as any);
+        await addTask(formattedData);
         toast.success('Task created');
       }
       onClose();
@@ -219,8 +214,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                   defaultValue="todo"
                 >
                   <option value="todo">To Do</option>
-                  <option value="in-process">In Process</option>
-                  <option value="review">Review</option>
+                  <option value="in_process">In Process</option>
                   <option value="completed">Completed</option>
                 </select>
               </div>
@@ -274,7 +268,8 @@ const CreateTaskModal = ({ isOpen, onClose, users, editTask }: Props) => {
                             </p>
                             <p className="text-gray-400">
                               User:{' '}
-                              {users.find((u) => u.id === log.user_id)?.name ||
+                              {log.user?.name ||
+                                users.find((u) => u.id === log.user_id)?.name ||
                                 log.user_id}
                             </p>
                           </div>

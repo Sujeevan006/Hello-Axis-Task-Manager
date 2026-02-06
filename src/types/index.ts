@@ -1,21 +1,20 @@
-export type Role = 'admin' | 'staff';
+export type Role = 'user' | 'admin';
 
 export interface User {
   id: string;
   name: string;
   email: string;
   role: Role;
-  avatar?: string;
-  department?: string;
+  avatar: string | null;
+  department: string | null;
   needs_password_change: boolean;
-  password?: string; // For updates/creation
-  created_at?: string;
+  created_at: string;
   updated_at?: string;
 }
 
 export type Priority = 'low' | 'medium' | 'high';
 
-export type TaskStatus = 'todo' | 'in-process' | 'review' | 'completed';
+export type TaskStatus = 'todo' | 'in_process' | 'completed';
 
 export interface ActivityLog {
   id: string;
@@ -33,12 +32,11 @@ export interface Task {
   status: TaskStatus;
   priority: Priority;
   due_date: string | null;
-  time_allocation: number | null;
-  creator_id: string;
-  assignee_id: string | null;
+  time_allocation: string | null;
+  creator: { id: string; name: string; avatar: string | null };
+  assignee: { id: string; name: string; avatar: string | null } | null;
   created_at: string;
-  creator?: { id: string; name: string; avatar?: string };
-  assignee?: { id: string; name: string; avatar?: string };
+  updated_at?: string;
   activity_logs?: ActivityLog[];
 }
 

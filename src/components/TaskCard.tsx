@@ -1,4 +1,4 @@
-import { Task, User } from '../types';
+import { Task } from '../types';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { MdAccessTime, MdEdit, MdDelete } from 'react-icons/md';
@@ -8,19 +8,12 @@ import { useAuth } from '../context/AuthContext';
 
 interface TaskCardProps {
   task: Task;
-  userMap: Record<string, User>;
   onClick: () => void;
   onEdit: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
 }
 
-const TaskCard = ({
-  task,
-  userMap,
-  onClick,
-  onEdit,
-  onDelete,
-}: TaskCardProps) => {
+const TaskCard = ({ task, onClick, onEdit, onDelete }: TaskCardProps) => {
   const { user } = useAuth();
 
   const {
@@ -45,9 +38,9 @@ const TaskCard = ({
     low: 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 border border-green-100 dark:border-green-900/30',
   };
 
-  const assignee = task.assignee_id ? userMap[task.assignee_id] : null;
+  const assignee = task.assignee;
 
-  const canEdit = user?.role === 'admin' || user?.id === task.creator_id;
+  const canEdit = user?.role === 'admin' || user?.id === task.creator.id;
 
   return (
     <div

@@ -4,33 +4,33 @@ import api from '../api/axios';
 // ==================== USER API ====================
 
 export const userAPI = {
-  // Get all users
+  // Get all users (Admin only)
   getAll: async (): Promise<User[]> => {
     const response = await api.get('/users');
     return response.data;
   },
 
-  // Get user by ID
-  getById: async (id: string): Promise<User> => {
-    const response = await api.get(`/users/${id}`);
-    return response.data;
-  },
-
-  // Create user
+  // Create user (Admin only)
   create: async (
-    userData: Partial<User>,
+    userData: Partial<User> & { password?: string },
   ): Promise<{ user: User; tempPassword?: string }> => {
     const response = await api.post('/users', userData);
     return response.data;
   },
 
-  // Update user
+  // Update user role (Admin only)
+  updateRole: async (id: string, role: string): Promise<User> => {
+    const response = await api.put(`/users/${id}/role`, { role });
+    return response.data;
+  },
+
+  // Update user profile (Generic update for current user or admin)
   update: async (id: string, updates: Partial<User>): Promise<User> => {
     const response = await api.put(`/users/${id}`, updates);
     return response.data;
   },
 
-  // Delete user
+  // Delete user (Admin only)
   delete: async (id: string): Promise<void> => {
     await api.delete(`/users/${id}`);
   },
@@ -40,13 +40,46 @@ export const userAPI = {
 
 export const authAPI = {
   // Login
-  login: async (email: string, password?: string) => {
+  login: async (email: string, password: string) => {
+    // TEMPORARY: Hardcoded superadmin for development testing
+    // TODO: Remove when backend registration is properly set up
+    if (
+      import.meta.env.DEV &&
+      email === 'superadmin@axivers.com' &&
+      password === 'Axis@123'
+    ) {
+      console.log('⚠️ USING HARDCODED SUPERADMIN CREDENTIALS FOR DEVELOPMENT');
+      const mockUser = {
+        token: 'dev-superadmin-token-12345',
+        user: {
+          id: 'superadmin-dev-id',
+          name: 'Super Admin',
+          email: 'superadmin@axivers.com',
+          role: 'admin' as const,
+          avatar: null,
+          department: 'Management',
+          needs_password_change: false,
+          created_at: new Date().toISOString(),
+        },
+      };
+
+      localStorage.setItem('token', mockUser.token);
+      localStorage.setItem('user', JSON.stringify(mockUser.user));
+
+      return {
+        success: true,
+        user: mockUser.user,
+        token: mockUser.token,
+      };
+    }
+
     try {
       const response = await api.post('/auth/login', { email, password });
       const { token, user } = response.data;
 
       if (token) {
         localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
       }
 
       return {
@@ -60,6 +93,18 @@ export const authAPI = {
         error: error.response?.data?.error || 'Login failed',
       };
     }
+  },
+
+  // Register
+  register: async (userData: any) => {
+    const response = await api.post('/auth/register', userData);
+    return response.data;
+  },
+
+  // Get current user profile
+  getMe: async (): Promise<User> => {
+    const response = await api.get('/auth/me');
+    return response.data;
   },
 
   // Change Password
@@ -92,39 +137,29 @@ export const taskAPI = {
 
   // Get task by ID
   getById: async (id: string): Promise<Task> => {
-    try {
-      const response = await api.get(`/tasks/${id}`);
-      return response.data;
-    } catch (error: any) {
-      // Fallback as per user request: If 404, fetch all and find client-side
-      if (error.response?.status === 404) {
-        const tasks = await taskAPI.getAll();
-        const task = tasks.find((t) => t.id === id);
-        if (task) return task;
-      }
-      throw error;
-    }
+    const response = await api.get(`/tasks/${id}`);
+    return response.data;
   },
 
   // Create task
-  create: async (taskData: Partial<Task>): Promise<Task> => {
+  create: async (taskData: any): Promise<Task> => {
     const response = await api.post('/tasks', taskData);
     return response.data;
   },
 
   // Update task
-  update: async (id: string, updates: Partial<Task>): Promise<Task> => {
+  update: async (id: string, updates: any): Promise<Task> => {
     const response = await api.put(`/tasks/${id}`, updates);
     return response.data;
   },
 
-  // Update task status (for drag and drop)
+  // Update task status
   updateStatus: async (id: string, status: TaskStatus): Promise<Task> => {
     const response = await api.patch(`/tasks/${id}/status`, { status });
     return response.data;
   },
 
-  // Delete task
+  // Delete task (Admin only)
   delete: async (id: string): Promise<void> => {
     await api.delete(`/tasks/${id}`);
   },

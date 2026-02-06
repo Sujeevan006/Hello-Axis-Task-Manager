@@ -41,10 +41,6 @@ const Tasks = () => {
   const [filterPriority, setFilterPriority] = useState<Priority | 'all'>('all');
   const [filterStaff, setFilterStaff] = useState<string>('all');
 
-  const userMap = useMemo(() => {
-    return users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
-  }, [users]);
-
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, {
@@ -70,14 +66,11 @@ const Tasks = () => {
     const overId = over.id as string;
 
     const task = tasks.find((t) => t.id === activeId);
-    // Find the drop column status
-    // If over item is a column container (droppable id is status)
-    // If over item is a task (sortable), find its status
 
     let newStatus: TaskStatus | undefined;
 
     // Check if dropped directly on a column
-    if (['todo', 'in-process', 'review', 'completed'].includes(overId)) {
+    if (['todo', 'in_process', 'completed'].includes(overId)) {
       newStatus = overId as TaskStatus;
     } else {
       // Dropped on another task
@@ -89,7 +82,7 @@ const Tasks = () => {
 
     if (task && newStatus && task.status !== newStatus) {
       moveTask(task.id, newStatus);
-      toast.success(`Moved to ${newStatus.replace('-', ' ')}`, { icon: '👏' });
+      toast.success(`Moved to ${newStatus.replace('_', ' ')}`, { icon: '👏' });
     }
 
     setActiveTask(null);
@@ -97,13 +90,10 @@ const Tasks = () => {
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((t) => {
-      // Permission check logic from prompt:
-      // "Staff View only tasks assigned to them or created by them"
-      // "Admin sees all tasks"
       if (currentUser?.role !== 'admin') {
         if (
-          t.assignee_id !== currentUser?.id &&
-          t.creator_id !== currentUser?.id
+          t.assignee?.id !== currentUser?.id &&
+          t.creator.id !== currentUser?.id
         )
           return false;
       }
@@ -111,7 +101,8 @@ const Tasks = () => {
       const matchSearch = t.title.toLowerCase().includes(search.toLowerCase());
       const matchPriority =
         filterPriority === 'all' || t.priority === filterPriority;
-      const matchStaff = filterStaff === 'all' || t.assignee_id === filterStaff;
+      const matchStaff =
+        filterStaff === 'all' || t.assignee?.id === filterStaff;
 
       return matchSearch && matchPriority && matchStaff;
     });
@@ -119,8 +110,7 @@ const Tasks = () => {
 
   const columns: { id: TaskStatus; title: string; color: string }[] = [
     { id: 'todo', title: 'To Do', color: 'border-blue-500' },
-    { id: 'in-process', title: 'In Process', color: 'border-amber-500' },
-    { id: 'review', title: 'Review', color: 'border-purple-500' },
+    { id: 'in_process', title: 'In Process', color: 'border-amber-500' },
     { id: 'completed', title: 'Completed', color: 'border-green-500' },
   ];
 
@@ -207,7 +197,6 @@ const Tasks = () => {
                 id={col.id}
                 title={col.title}
                 color={col.color}
-                userMap={userMap}
                 tasks={filteredTasks.filter((t) => t.status === col.id)}
                 onTaskClick={(task) => {
                   // Open detail modal - To implement
@@ -242,7 +231,6 @@ const Tasks = () => {
           {activeTask ? (
             <TaskCard
               task={activeTask}
-              userMap={userMap}
               onClick={() => {}}
               onEdit={() => {}}
               onDelete={() => {}}
